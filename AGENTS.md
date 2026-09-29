@@ -132,6 +132,51 @@ access to real machines.
 - Honour `Include` directives; a host may be defined in a file other than `config`.
 - Shell out to `ssh-keygen` for key generation rather than reimplementing key formats.
 
+## Spec-driven workflow (Kiro)
+
+This repo uses Kiro-style Spec-Driven Development on an agentic SDLC. The slash commands
+in `.claude/commands/kiro/` and the rules and templates in `.kiro/settings/` were
+scaffolded by `npx cc-sdd@latest --lang en`; re-running the installer regenerates them.
+
+### Paths
+
+| Path | Purpose |
+|---|---|
+| `.kiro/steering/` | **Steering** — project-wide rules and context that guide every feature |
+| `.kiro/specs/` | **Specs** — the formalized process for one individual feature |
+
+Load the whole of `.kiro/steering/` as project memory. The default steering files are
+`product.md`, `tech.md` and `structure.md`; custom ones are managed via
+`/kiro:steering-custom`. Check `.kiro/specs/` for active specifications, and
+`/kiro:spec-status {feature}` for progress.
+
+### Workflow
+
+- Phase 0 (optional): `/kiro:steering`, `/kiro:steering-custom`
+- Phase 1 (Specification):
+  - `/kiro:spec-init "description"`
+  - `/kiro:spec-requirements {feature}`
+  - `/kiro:validate-gap {feature}` (optional: for an existing codebase)
+  - `/kiro:spec-design {feature} [-y]`
+  - `/kiro:validate-design {feature}` (optional: design review)
+  - `/kiro:spec-tasks {feature} [-y]`
+- Phase 2 (Implementation): `/kiro:spec-impl {feature} [tasks]`
+  - `/kiro:validate-impl {feature}` (optional: after implementation)
+- Progress check: `/kiro:spec-status {feature}` (use anytime)
+
+### Rules
+
+- 3-phase approval workflow: Requirements → Design → Tasks → Implementation.
+- Human review is required at each phase; use `-y` only for an intentional fast-track.
+- Keep steering current and verify alignment with `/kiro:spec-status`.
+- Think in English, generate responses in English. All Markdown written to project files
+  (`requirements.md`, `design.md`, `tasks.md`, `research.md`, validation reports) MUST be
+  written in the target language configured for that spec (see `spec.json.language`).
+- Follow the user's instructions precisely, and within that scope act autonomously: gather
+  the context you need and complete the requested work end-to-end in this run, asking
+  questions only when essential information is missing or the instructions are critically
+  ambiguous.
+
 ## Commits
 
 - Conventional Commits, as already used in this repo (`ci(git): add gitignore`).
