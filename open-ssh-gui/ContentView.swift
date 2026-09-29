@@ -7,11 +7,3 @@ struct ContentView: View {
             .padding()
     }
 }
-
-#Preview {
-    ContentView()
-}
-
-#Playground {
-    _ = 1 + 2
-}
