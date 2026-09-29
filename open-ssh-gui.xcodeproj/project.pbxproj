@@ -12,7 +12,25 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		000000000000000000000030 /* Exceptions for "open-ssh-gui" folder in "open-ssh-guiTests" target */ = {
+		14E63CA5306D668A0080E692 /* Exceptions for "open-ssh-gui" folder in "open-ssh-gui" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
+				FileAccess/FileSystemSSHDirectoryReader.swift,
+				FileAccess/SSHDirectoryReading.swift,
+				MenuBar/SSHDirectoryStatus.swift,
+				MenuBar/SSHDirectoryStatusModel.swift,
+				MenuBar/SSHDirectoryStatusView.swift,
+				OpenSSHGUIApp.swift,
+				Resolution/SSHDirectoryResolver.swift,
+				Types/FileAccessError.swift,
+				Types/LaunchEnvironment.swift,
+				Types/SSHDirectory.swift,
+				Types/SSHDirectoryResolutionError.swift,
+			);
+			target = 000000000000000100000000 /* open-ssh-gui */;
+		};
+		14E63CA6306D668A0080E692 /* Exceptions for "open-ssh-gui" folder in "open-ssh-guiTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Assets.xcassets,
@@ -23,17 +41,18 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		000000000000000000000010 /* open-ssh-gui */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				000000000000000000000030 /* Exceptions for "open-ssh-gui" folder in "open-ssh-guiTests" target */,
-			);
-			path = "open-ssh-gui";
-			sourceTree = "<group>";
-		};
 		000000000000000000000011 /* open-ssh-guiTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "open-ssh-guiTests";
+			sourceTree = "<group>";
+		};
+		14E63C8E306D66890080E692 /* open-ssh-gui */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				14E63CA5306D668A0080E692 /* Exceptions for "open-ssh-gui" folder in "open-ssh-gui" target */,
+				14E63CA6306D668A0080E692 /* Exceptions for "open-ssh-gui" folder in "open-ssh-guiTests" target */,
+			);
+			path = "open-ssh-gui";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -55,7 +74,7 @@
 		000000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
-				000000000000000000000010 /* open-ssh-gui */,
+				14E63C8E306D66890080E692 /* open-ssh-gui */,
 				000000000000000000000011 /* open-ssh-guiTests */,
 				000000000000000000000020 /* Products */,
 			);
@@ -83,9 +102,6 @@
 			);
 			buildRules = (
 			);
-			fileSystemSynchronizedGroups = (
-				000000000000000000000010 /* open-ssh-gui */,
-			);
 			name = "open-ssh-gui";
 			productName = MyApp;
 			productReference = 000000000000000000000120 /* open-ssh-gui.app */;
@@ -102,8 +118,8 @@
 			buildRules = (
 			);
 			fileSystemSynchronizedGroups = (
-				000000000000000000000010 /* open-ssh-gui */,
 				000000000000000000000011 /* open-ssh-guiTests */,
+				14E63C8E306D66890080E692 /* open-ssh-gui */,
 			);
 			name = "open-ssh-guiTests";
 			productName = "open-ssh-guiTests";
