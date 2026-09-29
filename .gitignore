@@ -86,3 +86,7 @@ fastlane/test_output
 iOSInjectionProject/
 
 # End of https://www.toptal.com/developers/gitignore/api/swift
+
+# Secrets
+.env
+.mcp.json
