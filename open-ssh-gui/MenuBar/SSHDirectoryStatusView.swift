@@ -7,12 +7,31 @@ import SwiftUI
 struct SSHDirectoryStatusView: View {
     let model: SSHDirectoryStatusModel
 
+    /// Height reserved for the path and indicator rows together.
+    ///
+    /// `menuBarExtraStyle(.window)` hosts this view in a panel that sizes itself to its
+    /// content, and `refresh()` settles `.resolving` into a terminal state while that panel
+    /// is still being laid out. Letting the content change height at that moment makes AppKit
+    /// re-enter layout, which it reports as `_NSDetectedLayoutRecursion`. Reserving the
+    /// worst-case height up front keeps the panel one fixed size, so the state change
+    /// repaints without resizing anything.
+    ///
+    /// Both rows are bounded to two lines, so this covers every state. `@ScaledMetric` keeps
+    /// it correct when the user's text size differs from the default.
+    @ScaledMetric(relativeTo: .body) private var reservedStatusHeight: CGFloat = 70
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("SSH directory")
                 .font(.headline)
 
-            directory
+            // Both rows are always present, so settling out of `.resolving` swaps text rather
+            // than adding or removing views.
+            VStack(alignment: .leading, spacing: 6) {
+                path
+                indicator
+            }
+            .frame(minHeight: reservedStatusHeight, alignment: .topLeading)
 
             Divider()
 
@@ -28,30 +47,36 @@ struct SSHDirectoryStatusView: View {
         .task { await model.refresh() }
     }
 
-    @ViewBuilder
-    private var directory: some View {
+    /// The resolved directory, or the path an override was rejected for.
+    private var path: some View {
+        Text(model.status.displayPath ?? "—")
+            .font(.system(.body, design: .monospaced))
+            .textSelection(.enabled)
+            .lineLimit(2)
+            .truncationMode(.middle)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// Reachability, or the reason in its place when the directory cannot be reached.
+    private var indicator: some View {
         let status = model.status
 
-        if let path = status.displayPath {
-            Text(path)
-                .font(.system(.body, design: .monospaced))
-                .textSelection(.enabled)
-                .lineLimit(2)
-                .truncationMode(.middle)
-
+        return Group {
             if let reason = status.failureReason {
                 Label(reason, systemImage: "exclamationmark.triangle.fill")
                     .foregroundStyle(.orange)
-                    .font(.callout)
             } else if status.isReachable {
                 Label("Reachable", systemImage: "checkmark.circle.fill")
                     .foregroundStyle(.green)
-                    .font(.callout)
+            } else {
+                Label("Resolving…", systemImage: "ellipsis.circle")
+                    .foregroundStyle(.secondary)
             }
-        } else {
-            Label("Resolving…", systemImage: "ellipsis.circle")
-                .foregroundStyle(.secondary)
-                .font(.callout)
         }
+        .font(.callout)
+        .lineLimit(2)
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
