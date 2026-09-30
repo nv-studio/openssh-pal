@@ -21,12 +21,25 @@ are the source of truth for file formats and semantics.
 
 ```
 app/
-├── open-ssh-gui.xcodeproj/     # Xcode project (no SPM manifest, no workspace)
-└── open-ssh-gui/
-    ├── MyApp.swift             # @main App entry point
-    ├── ContentView.swift       # root view
-    └── Assets.xcassets/
+├── open-ssh-gui.xcodeproj/                 # Xcode project (no SPM manifest, no workspace)
+│   └── xcshareddata/xcschemes/             # shared scheme; carries the test action
+├── open-ssh-gui/
+│   ├── OpenSSHGUIApp.swift                 # @main scene and the only composition root
+│   ├── Types/                              # SSHDirectory, LaunchEnvironment, error enums
+│   ├── FileAccess/                         # SSHDirectoryReading port + FileManager adapter
+│   ├── Resolution/                         # SSHDirectoryResolver
+│   ├── MenuBar/                            # status enum, observable model, view
+│   └── Assets.xcassets/
+└── open-ssh-guiTests/                      # Swift Testing, no host application
+    └── Support/                            # fakes and scratch-directory helper
 ```
+
+Directory names map onto the architecture layers. Imports run one way only:
+
+`Types → FileAccess → Resolution → MenuBar → OpenSSHGUIApp`
+
+A reference that runs the other way is an error, not a style question. In particular nothing
+in `MenuBar/` may reach the file system except through the `FileAccess` port.
 
 ## Toolchain & build
 
@@ -36,7 +49,10 @@ app/
 | UI | SwiftUI |
 | Deployment target | macOS 27.0 |
 | Dependencies | none (no SPM packages) |
-| Sandbox | `ENABLE_APP_SANDBOX = YES` |
+| Sandbox | `ENABLE_APP_SANDBOX = NO` — deliberate, see Established foundation |
+| Presence | `INFOPLIST_KEY_LSUIElement = YES` (agent mode, no Dock icon) |
+| Platform | `SUPPORTED_PLATFORMS = macosx`, `SDKROOT = macosx` |
+| Tests | `open-ssh-guiTests`, Swift Testing, **no host application** |
 
 ```sh
 # Build
@@ -50,24 +66,63 @@ xcodebuild -project open-ssh-gui.xcodeproj -list
 ```
 
 Do not hand-edit `project.pbxproj` unless there is no alternative; when you must, change
-one setting at a time and verify with a build. Never commit `xcuserdata/`.
+one setting at a time and verify with a build. Never commit `xcuserdata/`; do commit
+`xcshareddata/xcschemes/`, since the shared scheme is what gives a fresh clone a test action.
 
-## Current state — read before planning work
+New source files under `open-ssh-gui/` join the app target automatically — the project uses
+`PBXFileSystemSynchronizedRootGroup`, so there are no per-file references to maintain. Target
+membership is expressed as `PBXFileSystemSynchronizedBuildFileExceptionSet` entries listing
+*deviations* from a target's default, which reads as inverted depending on which target owns
+the group; Xcode rewrites these blocks freely, so verify with a build rather than by reading
+the diff. A new *target* still needs real project structure changes.
 
-The repo is still the stock Xcode multiplatform template. Several settings contradict the
-product described above; fix them as part of the first real feature rather than building
-on top of them:
+## Established foundation — read before planning work
 
-- `SUPPORTED_PLATFORMS` includes `iphoneos iphonesimulator xros xrsimulator` and the
-  target carries iOS `INFOPLIST_KEY_*` entries. This is a macOS-only app; narrow it.
-- `ENABLE_APP_SANDBOX = YES` blocks direct `~/.ssh` access. Either disable the sandbox or
-  add the entitlements/security-scoped bookmarks needed to reach `~/.ssh`. Decide this
-  explicitly — it drives the whole file-access design.
-- `PRODUCT_BUNDLE_IDENTIFIER` is still `devplaceholder.…`.
-- The app uses `WindowGroup`; the menu bar UI needs `MenuBarExtra`.
-- `ContentView.swift` imports `Playgrounds` and contains a `#Playground` scratch block.
-  Remove it when the view becomes real.
-- There is no test target yet. Add one before writing parsing logic.
+The `macos-menu-bar-foundation` spec has shipped. The template residue it describes is gone,
+so the decisions below are settled. Build on them; do not relitigate them, and treat any
+change to one as a cross-spec concern.
+
+- **macOS only.** `SUPPORTED_PLATFORMS = macosx`, `SDKROOT = macosx`, no iOS/visionOS
+  destinations, no `INFOPLIST_KEY_UI*` keys, no `TARGETED_DEVICE_FAMILY`.
+- **The App Sandbox is off, on purpose.** It blocks direct `~/.ssh` access, and a sandboxed
+  process's children inherit the sandbox, so `ssh-keygen` could never run. The cost is that
+  the Mac App Store is not a distribution channel: it will be Developer ID + notarization.
+  Re-enabling the sandbox invalidates the file-access design and the key-management spec.
+- **Agent mode.** `LSUIElement` means no Dock icon and no application-switcher entry, so the
+  menu bar panel's Quit control is the user's only way out. Any new surface must account for
+  the app having no Dock presence.
+- **`MenuBarExtra` is the only scene**, with `.menuBarExtraStyle(.window)`. No `WindowGroup`,
+  so no window opens at launch. Adding a window scene is a product decision, not a detail.
+- **All file access goes through the `SSHDirectoryReading` port**, injected via initializers.
+  It is read-only, and that is structural: there is no write method to misuse. A feature that
+  must write declares a *separate* writing port — never widen this one. Nothing constructs a
+  concrete adapter except `OpenSSHGUIApp`.
+- **Reads are marked `@concurrent`, not merely `nonisolated`.** Because
+  `SWIFT_APPROACHABLE_CONCURRENCY = YES` enables nonisolated-nonsending by default, a
+  `nonisolated async` method runs on *the caller's* executor — so a `@MainActor` caller would
+  drag file I/O onto the main actor while the type still looked correctly annotated. Keep
+  `@concurrent` on anything that touches the file system.
+- **The SSH directory is resolved once per launch** and is redirectable for development by
+  `--ssh-directory <path>` or `OPEN_SSH_GUI_SSH_DIRECTORY`, argument winning. An invalid
+  override fails loudly and never falls back to the home directory. The once-per-launch
+  guarantee lives in `SSHDirectoryStatusModel`'s memoization — it is the only thing upholding
+  it, so a "re-resolve" affordance would silently break it.
+- **The test target has no host application.** That is a safety control, not a preference: a
+  host-based target launches the app on every test run, and the app then reads the real
+  `~/.ssh`. Do not add a host application. If a future UI test target needs one, its scheme
+  must set `--ssh-directory` to a scratch path, in the **shared** `.xcscheme`.
+- **Use the existing test doubles.** `InMemorySSHDirectoryReader` for fabricated listings,
+  `RecordingSSHDirectoryReader` when call counts matter, `TemporaryDirectory.withOne` for a
+  scratch directory that is removed even when the test fails. No test source may name the
+  current user's home directory or a literal SSH directory path.
+
+Still outstanding, and deliberately deferred:
+
+- `PRODUCT_BUNDLE_IDENTIFIER` is still `devplaceholder.…`. Bundle identifier, signing,
+  provisioning and notarization belong to a later release spec, which must preserve the
+  disabled sandbox.
+- Nothing parses `~/.ssh/config` yet, nothing honours `Include`, and no key management
+  exists. Those specs own the atomic-write, permission and backup rules below.
 
 ## Swift conventions
 
