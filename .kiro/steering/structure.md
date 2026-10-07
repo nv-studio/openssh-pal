@@ -11,9 +11,14 @@ The dependency direction is one-way:
 
 ```
 Types → FileAccess → Resolution → MenuBar → OpenSSHGUIApp
+DesignSystem → MenuBar
+DesignSystem → Showcase
 ```
 
-A reference that runs right-to-left is an error, not a style preference.
+`DesignSystem/` is a dependency **root** alongside `Types/`. It depends on nothing else in the
+project, which is what lets every later feature adopt it without creating a cycle, and it never
+names an OpenSSH concept. A reference that runs right-to-left — or any reference *out of*
+`DesignSystem/` into another project directory — is an error, not a style preference.
 
 ## Directory Patterns
 
@@ -45,6 +50,27 @@ and the validation-failure semantics.
 SwiftUI views. Views bind to a model and contain no logic.
 **Example**: a status enum in which reachable-carrying-an-error is unrepresentable, plus the
 projection the view renders.
+
+### Design system
+**Location**: `open-ssh-gui/DesignSystem/`
+**Purpose**: The project's presentation vocabulary — tokens, style conformances, chrome
+modifiers, composite views and the closed types that drive them. Imports Apple SDK frameworks
+and nothing else, so a reference into another project directory is a visible violation.
+**Example**: a `ButtonStyle` applied once at the scene root and inherited by every descendant
+button; a closed status vocabulary whose symbol and colour projections are unit-tested without
+rendering a view.
+
+The layer styles the native controls rather than replacing them, because a style applied to an
+ancestor reaches call sites written by someone who never read these documents. `TextFieldStyle`,
+`ListStyle` and `PickerStyle` declare only underscored requirements over opaque types and are
+therefore not implementable; those three controls get a `ViewModifier` plus a composite instead,
+and conforming to them anyway would mean calling private SDK interface.
+
+### Temporary surfaces
+**Location**: `open-ssh-gui/Showcase/`
+**Purpose**: A component gallery that exists only until the next feature spec replaces it. Kept
+in its own directory so removal is deleting the directory plus one line in the composition root,
+with no edit to any design system file.
 
 ### Composition root
 **Location**: `open-ssh-gui/OpenSSHGUIApp.swift`
