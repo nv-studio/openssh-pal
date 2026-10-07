@@ -41,6 +41,35 @@ enum SSHDirectoryStatus: Sendable, Equatable {
         return false
     }
 
+    /// The status vocabulary the design system's indicator renders.
+    ///
+    /// The mapping lives here rather than in the design system, so that layer never learns what an
+    /// SSH directory is. An unreadable directory is a *warning* rather than a failure because the
+    /// directory exists and the user can usually fix it; a rejected override is a failure because
+    /// there is no directory at all.
+    var statusRole: StatusRole {
+        switch self {
+        case .resolving: .inProgress
+        case .reachable: .success
+        case .unresolved: .failure
+        case .unreadable: .warning
+        }
+    }
+
+    /// The words beside the indicator's icon. Never empty, so the row is never a bare glyph.
+    var statusMessage: String {
+        switch self {
+        case .resolving:
+            "Resolving…"
+        case .reachable:
+            "Reachable"
+        case .unresolved(let error):
+            error.reason
+        case .unreadable(_, let error):
+            error.reason
+        }
+    }
+
     /// Why the directory is not reachable, shown in place of the indicator. `nil` when there
     /// is nothing to explain.
     var failureReason: String? {
