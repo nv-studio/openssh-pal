@@ -19,7 +19,7 @@ struct LabeledField: View {
     /// component's height. The panel sizes itself to its content, and a height change while AppKit
     /// is laying it out is what produced `_NSDetectedLayoutRecursion` once already — see the
     /// reserved height this project already carries in its status view.
-    @ScaledMetric(relativeTo: .caption) private var messageHeight: CGFloat = 14
+    @ScaledMetric(relativeTo: .caption) private var messageHeight = PanelMetrics.fieldMessageHeight
 
     init(
         label: String,

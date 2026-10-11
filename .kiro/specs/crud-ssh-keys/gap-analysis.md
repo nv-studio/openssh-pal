@@ -169,9 +169,14 @@ Commit `c38363c` and the `reservedStatusHeight` comment record that `menuBarExtr
 
 Candidates: a fixed panel height with both surfaces scrolling inside it; reserved height as today, scaled up; or `NavigationStack` inside the panel — untested in a `MenuBarExtra` and the most likely to reintroduce the recursion. Whether a `NavigationStack` transition is even well-behaved in an `NSPanel` that sizes to content is the open question.
 
-### R4 — Requirement 6.4 is gated on absent capability **(Constraint)**
+### R4 — Requirement 6.4 is gated on absent capability **(Constraint, settled)**
 
 "Where SSH configuration reading is available, list the host entries whose identity file names the key" cannot be satisfied — no config parser exists, and it belongs to a later spec. The `Where` gating is correct EARS, but the design should state plainly that this criterion is unmet in this iteration, rather than leaving a reviewer to infer it.
+
+**Requirement 6.4 stays in this spec** rather than moving to the config spec: this feature is where the question gets asked, so it is where the answer belongs. The note now under Requirement 6 records why a rename warns instead of rewriting the config, and reserves the resolvable-reference opt-in for the config spec. Two findings behind that note bear on the design:
+
+- `ssh_config(5)` permits tilde syntax, environment variables, and the tokens `%%  %C  %d  %h  %i  %j  %k  %L  %l  %n  %p  %r  %u` in an `IdentityFile` argument, so matching a reference to a key is a path-equivalence problem, not a string comparison — and `%h`/`%r` resolve per connection, making some references impossible to match statically at all. Whatever eventually implements 6.4 must be able to report a reference it cannot resolve, rather than treating unresolvable as absent.
+- The same man page states that `ssh(1)` derives a certificate path by appending `-cert.pub` to the `IdentityFile` path. That is independent confirmation that Requirement 4.2's certificate sidecar must follow a rename: leaving it behind orphans it from OpenSSH's own point of view.
 
 ### R5 — Design system dependency **(Blocker)**
 
@@ -215,6 +220,6 @@ Requirement 13 requires every control to come from the design system; Requiremen
 
 **Requirements worth revisiting before approval:**
 
-- **Requirement 6.4** is unsatisfiable this iteration (R4) — either accept it as `Where`-gated and dormant, or move it to the config spec.
+- **Requirement 6.4** is unsatisfiable this iteration and stays `Where`-gated and dormant (R4, settled — an earlier draft of this document suggested moving it to the config spec; that was wrong). The design should say so explicitly rather than leave it implied.
 - **Requirement 9** should say explicitly that the outcome is verified rather than inferred from exit status, given the silent-downgrade hazard in R2.
 - **Requirement 13** makes `design-system` a hard prerequisite. If that spec slips, this one does too — worth acknowledging before approval rather than discovering at implementation.

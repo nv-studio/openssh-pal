@@ -55,7 +55,8 @@ the breakage at the next connection attempt.
   list and the form; and replacing the design system's temporary showcase.
 
 - **Out of scope**: parsing `~/.ssh/config` or honouring `Include`; creating, editing or
-  deleting host entries; editing the comment inside an existing public key file; changing an
+  deleting host entries; updating any reference to a renamed key, in the configuration or
+  anywhere else (see the note under Requirement 6); editing the comment inside an existing public key file; changing an
   existing key's passphrase; importing or exporting keys, converting between key formats, or
   producing certificates; adding keys to or removing them from `ssh-agent`; `authorized_keys`
   and anything on a remote host; watching the SSH directory for external changes; moving a
@@ -162,12 +163,40 @@ no longer exists.
 4. Where SSH configuration reading is available to the app, the Key Management feature shall list the host entries whose identity file names the key being renamed.
 5. If the user does not proceed, then the Key Management feature shall leave every file unchanged.
 
+**Note — why a rename warns rather than rewriting `~/.ssh/config`.** Recorded here so the
+decision is not re-litigated when the configuration spec arrives.
+
+Rewriting the config would be neither sufficient nor safe:
+
+- **It is not the whole set.** `IdentityFile` is one referent among many. The others include
+  `/etc/ssh/ssh_config` (root-owned, outside this app's remit), `ssh -i` in scripts and
+  Makefiles, `core.sshCommand` and `GIT_SSH_COMMAND`, `ssh-add` lines in shell startup files
+  and launch agents, Ansible's `ansible_ssh_private_key_file`, and editor and client
+  configurations. Fixing one of these and reporting success would suppress the check the user
+  would otherwise make.
+- **A reference cannot always be resolved to a path.** `ssh_config(5)` permits tilde syntax,
+  environment variables, and the tokens `%%  %C  %d  %h  %i  %j  %k  %L  %l  %n  %p  %r  %u`
+  in an `IdentityFile` argument. `~/.ssh/id_ed25519`, `%d/.ssh/id_ed25519` and
+  `$HOME/.ssh/id_ed25519` all name one file, while `%h` and `%r` resolve per connection and
+  cannot be matched to a specific key at rename time at all. Multiple `IdentityFile`
+  directives are additive rather than overriding, so no one directive can be reasoned about
+  alone. A rewriter would therefore have to miss references or guess at them.
+- **The cost is asymmetric.** The warning costs one dialog. A faulty rewrite of the file that
+  governs access to every machine the user reaches costs that access, as a side effect of an
+  operation the user asked for on two key files.
+
+Requirement 6.4 is therefore satisfied vacuously in this iteration and becomes live once
+configuration reading exists. **Deliberately deferred to that point:** offering to update the
+references the parser can resolve to a concrete path, as an explicit opt-in that lists the
+affected entries for review. That is a different obligation from a silent side effect, and it
+would never cover the tokenised references, which stay in the warning permanently.
+
 ### Requirement 7: Delete a Key Pair
 **Objective:** As a developer, I want to remove a key I no longer use, so that my SSH
 directory reflects the identities this machine actually needs.
 
 #### Acceptance Criteria
-1. When the user activates the delete control for a key pair, the Key Management feature shall request confirmation before removing anything.
+1. When the user activates the delete control for a key pair, the Key Management feature shall request confirmation through the Design System's confirming button style before removing anything.
 2. The Key Management feature's confirmation request shall name the key pair and shall state that the removal is permanent and cannot be undone.
 3. When the user confirms a deletion, the Key Management feature shall remove the private key file, the public key file and any associated certificate file.
 4. When a deletion completes, the Key Management feature shall remove the entry from the presented list.
@@ -175,6 +204,7 @@ directory reflects the identities this machine actually needs.
 6. If any file in the pair cannot be removed, then the Key Management feature shall report the reason and shall name the files that remain.
 7. The Key Management feature shall not delete any file the user did not identify through a presented entry.
 8. The Key Management feature shall require a separate confirmation for each deletion, and shall not offer a way to suppress the confirmation.
+9. The Key Management feature shall supply the confirmation's title and message, naming the key pair and stating that the removal is permanent.
 
 ### Requirement 8: Create a Key Pair — Form
 **Objective:** As a developer, I want a form that asks for what `ssh-keygen` needs, so that I
@@ -219,8 +249,19 @@ using the terminal.
 4. The Key Management feature shall not write a passphrase to any file, log or persistent store.
 5. The Key Management feature shall not expose a passphrase in the argument list or the environment of any process it launches, so that the passphrase cannot be observed from a process listing.
 6. While the user is entering a passphrase, the create form shall render it redacted, and shall reveal it only when the user explicitly requests it.
-7. When generation completes or is abandoned, the Key Management feature shall discard the entered passphrase from memory.
+7. When generation completes or is abandoned, the Key Management feature shall retain no reference to the entered passphrase.
 8. The Key Management feature shall not include a passphrase or a private key path in any user-facing error message.
+
+**Note — the scope of 10.7.** An earlier draft required the passphrase to be discarded "from
+memory". That is not something this app can promise. By the time a passphrase reaches the
+feature, the text system has already held it, and Swift's copy-on-write string buffers may
+hold copies beyond any reach of the app's own code; a GUI process cannot account for what the
+window server retains either. The requirement is therefore stated as the obligation the app
+can actually discharge and a reviewer can actually check: **no component retains a reference**
+once generation finishes or is abandoned. Criteria 10.4, 10.5 and 10.8 carry the rest of the
+protection — nothing is written down, nothing reaches a process listing, nothing is printed —
+and those are enforceable. Claiming memory scrubbing on top of them would be a promise the
+implementation could not keep.
 
 ### Requirement 11: File Mutation Safety
 **Objective:** As a user, I want the app to leave my SSH directory in a state OpenSSH still

@@ -66,6 +66,10 @@ The rule throughout is: style the controls, compose the layouts.
   - **Requirement 10 (secret field) ships the control, not the policy.** The key-management
     spec owns the reveal flow, what constitutes key material, and any audit obligation.
     Requirement 10.3 keeps that authority with the caller so this control cannot pre-empt it.
+  - **The confirming button style is the app's single confirmation mechanism.** Requirements
+    3.9 to 3.11 were added so that a caller needing to name what it is about to destroy — the
+    key-management spec's deletion confirmation, for one — does not have to build a second
+    confirmation flow alongside this one. The style owns the gate; the caller owns the words.
   - Later specs adopt these components rather than styling controls inline; a feature that
     needs a value no token defines adds a token.
 
@@ -113,7 +117,10 @@ call site cannot bypass.
 6. The Design System shall provide a `PrimitiveButtonStyle` conformance that intercepts activation, so that behaviour applying to every button can be added in one place.
 7. When a button declares the destructive role, the Design System shall render a destructive appearance.
 8. When a destructive-role button is activated through the Design System's confirming button style, the Design System shall invoke the button's action only after the user confirms.
-9. The Design System's button components shall preserve the native `Button`'s keyboard activation, focus ring and accessibility behaviour.
+9. The Design System's confirming button style shall present a caller-supplied title and message in its confirmation, so that a confirmation can name the specific thing being acted on.
+10. The Design System's confirming button style shall not offer the user any means of suppressing future confirmations, so that a caller cannot be bypassed by a remembered preference.
+11. When the user declines a confirmation, the Design System's confirming button style shall not invoke the button's action.
+12. The Design System's button components shall preserve the native `Button`'s keyboard activation, focus ring and accessibility behaviour.
 
 ### Requirement 4: Label and Labeled Row Components
 **Objective:** As a developer, I want labels and key/value rows to come from one definition,

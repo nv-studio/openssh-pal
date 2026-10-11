@@ -13,17 +13,22 @@ struct BoundedList<Element: Identifiable, Row: View>: View {
 
     /// Scales with the user's text size, so the bound holds about the same number of rows
     /// whatever size they read at.
-    @ScaledMetric(relativeTo: .body) private var maximumHeight: CGFloat = 140
+    @ScaledMetric private var maximumHeight: CGFloat
 
     init(
         elements: [Element],
         selection: Binding<Element.ID?>,
         emptyState: EmptyStateContent,
+        maximumHeight: CGFloat = 140,
         @ViewBuilder row: @escaping (Element) -> Row
     ) {
         self.elements = elements
         self._selection = selection
         self.emptyState = emptyState
+        // Taken as a parameter rather than fixed, because a surface that *is* a list needs
+        // most of the panel while a list beside other content needs much less. It is still a
+        // bound the caller states explicitly, never one derived from the content.
+        self._maximumHeight = ScaledMetric(wrappedValue: maximumHeight, relativeTo: .body)
         self.row = row
     }
 
