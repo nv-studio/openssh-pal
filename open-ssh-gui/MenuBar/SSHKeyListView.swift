@@ -13,7 +13,8 @@ struct SSHKeyListView: View {
     @Bindable var model: SSHKeyListModel
 
     /// Kept alongside the list because the user needs to know *which* directory these keys
-    /// are in, especially under a launch override.
+    /// are in, especially under a launch override. Rendered by `SSHDirectoryStatusView`
+    /// rather than rebuilt here, so one view decides how a directory is laid out.
     let status: SSHDirectoryStatusModel
 
     /// Asks the panel to show the create form. The route is the panel's to own.
@@ -22,8 +23,8 @@ struct SSHKeyListView: View {
     @State private var selection: SSHKeyName?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.regular) {
-            directorySection
+        VStack(alignment: .leading, spacing: Spacing.loose) {
+            SSHDirectoryStatusView(model: status)
 
             Divider()
 
@@ -31,30 +32,22 @@ struct SSHKeyListView: View {
 
             Spacer(minLength: 0)
         }
-        .frame(width: PanelMetrics.width, height: PanelMetrics.surfaceHeight, alignment: .top)
+        .frame(width: PanelMetrics.contentWidth, height: PanelMetrics.surfaceHeight, alignment: .top)
         .task { await model.refresh() }
-    }
-
-    // MARK: - The directory
-
-    private var directorySection: some View {
-        VStack(alignment: .leading, spacing: Spacing.snug) {
-            SectionHeader(title: "SSH directory")
-            CodeText(text: status.status.displayPath ?? "—", lineLimit: 1)
-            StatusIndicator(role: status.status.statusRole, message: status.status.statusMessage)
-        }
     }
 
     // MARK: - The keys
 
     private var keysSection: some View {
-        VStack(alignment: .leading, spacing: Spacing.snug) {
-            SectionHeader(title: "Key pairs")
+        VStack(alignment: .leading, spacing: Spacing.regular) {
+            VStack(alignment: .leading, spacing: Spacing.snug) {
+                SectionHeader(title: "Key pairs")
 
-            // The region is one height whichever of the three things it holds, so neither an
-            // empty directory nor an unreadable one moves what is below it.
-            listRegion
-                .frame(height: PanelMetrics.keyListHeight, alignment: .top)
+                // The region is one height whichever of the three things it holds, so neither
+                // an empty directory nor an unreadable one moves what is below it.
+                listRegion
+                    .frame(height: PanelMetrics.keyListHeight, alignment: .top)
+            }
 
             detailRegion
 
@@ -108,6 +101,7 @@ struct SSHKeyListView: View {
             }
         }
         .frame(height: PanelMetrics.keyDetailHeight, alignment: .topLeading)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 
     @ViewBuilder private var actionsRegion: some View {

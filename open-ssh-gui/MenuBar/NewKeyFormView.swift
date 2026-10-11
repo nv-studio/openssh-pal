@@ -13,7 +13,7 @@ struct NewKeyFormView: View {
     let onCancel: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.regular) {
+        VStack(alignment: .leading, spacing: Spacing.loose) {
             SectionHeader(title: "New key pair")
 
             ScrollView {
@@ -22,13 +22,15 @@ struct NewKeyFormView: View {
                     comment
                     passphrases
                 }
-                // Keeps the scroll indicator off the field chrome.
+                // Keeps the scroll indicator off the field chrome, and leaves the last field
+                // clear of the footer when the region is scrolled to its end.
                 .padding(.trailing, Spacing.snug)
+                .padding(.bottom, Spacing.snug)
             }
 
             footer
         }
-        .frame(width: PanelMetrics.width, height: PanelMetrics.surfaceHeight, alignment: .top)
+        .frame(width: PanelMetrics.contentWidth, height: PanelMetrics.surfaceHeight, alignment: .top)
     }
 
     // MARK: - Fields

@@ -310,7 +310,7 @@ Tasks 1 to 3 have no dependency on it and can proceed in parallel with its imple
 
 ## Implementation Record — code complete, launch verification outstanding
 
-Tasks 1 to 3, 5, 7.1 and 7.2 are complete and verified by the suite: **356 tests in 39
+Tasks 1 to 3, 5, 7.1 and 7.2 are complete and verified by the suite: **357 tests in 39
 suites pass** on a macOS destination.
 
 Tasks **4.1, 4.2, 6.1 to 6.5, 7.3 and 7.4 are implemented but left unchecked**, because each
@@ -325,8 +325,9 @@ left, is recorded below.
   nothing; no diagnostic of any kind is emitted (`panel-run.log` was empty).
 - `PanelSizingTests` asserts, through `ImageRenderer`, that both surfaces are *explicitly*
   sized, that they are the same size, and that the panel is exactly its token height. That is
-  the mechanism 12.5 to 12.8 depend on. It does **not** prove the content fits without
-  clipping, nor that no layout-recursion diagnostic appears across repeated opens.
+  the mechanism 12.5 to 12.8 depend on, and it now also asserts that a surface is laid out
+  inside the panel's gutter rather than across it. It does **not** prove the content fits
+  without clipping, nor that no layout-recursion diagnostic appears across repeated opens.
 - `MutationSafetyTests` and `KeyMaterialSafetyTests` assert containment, bystander safety,
   atomicity against a real scratch directory, write provenance, and that no private key is
   read and no passphrase reaches a file, an argument list, an environment or a reason.
@@ -343,6 +344,25 @@ bounded lazy stack. **The scrolling container was adopted**: the key list render
 design system's `BoundedList`, which is a `List` at an explicit frame height, inside a surface
 that is itself an exact height. Nothing collapsed and no fallback was needed. The remaining
 clause — one size across at least three consecutive opens — needs the panel opened.
+
+### Measured surface heights
+
+A bound `frame` reports its bound whatever is inside it, so the suite cannot assert that a
+surface fits. Measuring it needs `height:` deleted from the surface's own `frame` and the
+result rendered through `ImageRenderer`. Done once, by hand, at the default text size:
+
+| Surface | Wants | Bound |
+| --- | --- | --- |
+| Key list, 1 to 12 keys | 438 | 448 |
+| Key list, empty | 310 | 448 |
+| Create form | 383 | 448 |
+| Whole panel | 525 | 548 |
+
+`surfaceHeight` was 420 and clipped the key list by 18 points; it is now 448. The panel's
+remaining 23 points are deliberate headroom, because every region is a fixed height and a
+larger text size has to grow into something — the first region it would otherwise clip is
+Quit. **This is the number 6.3's increased-text-size check is really testing**, and it is
+the one measurement that will need redoing whenever either surface gains a row.
 
 ### What is left to do, by hand
 

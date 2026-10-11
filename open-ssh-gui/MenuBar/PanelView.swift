@@ -39,7 +39,7 @@ struct PanelView: View {
             .keyboardShortcut("q")
             .accessibilityLabel("Quit open-ssh-gui")
         }
-        .padding(Spacing.loose)
+        .padding(PanelMetrics.contentInset)
         .frame(width: PanelMetrics.width, height: PanelMetrics.height, alignment: .top)
         // Also checked on appear, not only on change: a generation that finished while the
         // panel was dismissed has already changed `completion`, so an `onChange` alone would
@@ -76,7 +76,7 @@ struct PanelView: View {
                 StatusIndicator(role: .inProgress, message: "Reading the SSH directory…")
             }
         }
-        .frame(width: PanelMetrics.width, height: PanelMetrics.noticeHeight, alignment: .topLeading)
+        .frame(width: PanelMetrics.contentWidth, height: PanelMetrics.noticeHeight, alignment: .topLeading)
     }
 
     /// Takes whatever the create form finished with, returns to the list, and hands a created

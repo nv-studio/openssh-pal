@@ -95,8 +95,29 @@ struct PanelSizingTests {
         let formSize = try #require(Self.renderedSize(of: NewKeyFormView(model: form) {}))
 
         #expect(listSize == formSize)
-        #expect(listSize.width == PanelMetrics.width)
+        #expect(listSize.width == PanelMetrics.contentWidth)
         #expect(listSize.height == PanelMetrics.surfaceHeight)
+    }
+
+    @Test("A surface is laid out inside the panel's gutter rather than across it")
+    func surfacesRespectTheGutter() async throws {
+        // The panel pads its content and then clamps itself to `width`. A surface that stated
+        // `width` was proposed the narrower width, insisted on the wider one, and was drawn
+        // edge to edge — the gutter cancelled for the one region that fills the panel, while
+        // the divider and Quit beneath it kept theirs.
+        #expect(PanelMetrics.contentWidth + PanelMetrics.contentInset * 2 == PanelMetrics.width)
+
+        let (list, form, status) = Self.models(keyCount: 12)
+        await list.refresh()
+        form.begin(in: SSHDirectory(url: Self.keys), existing: [])
+
+        for surface in [
+            AnyView(SSHKeyListView(model: list, status: status) {}),
+            AnyView(NewKeyFormView(model: form) {}),
+        ] {
+            let size = try #require(Self.renderedSize(of: surface))
+            #expect(size.width == PanelMetrics.contentWidth)
+        }
     }
 
     @Test("The whole panel is explicitly sized to the exact height its token names")

@@ -39,6 +39,7 @@ struct SSHKeyRowView: View {
 
             Spacer(minLength: 0)
         }
+        .padding(.vertical, Spacing.hairline)
         .frame(maxWidth: .infinity, alignment: .leading)
         // The state is in the words as well as the icon's tint, so nothing here is conveyed
         // by colour alone.

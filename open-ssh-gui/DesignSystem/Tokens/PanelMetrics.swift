@@ -7,9 +7,24 @@ import Foundation
 /// again. Added rather than reusing `Spacing`, since a width is not a gap.
 enum PanelMetrics {
 
-    /// The panel's width. Every surface uses the same one, so a component laid out for one panel
-    /// fits all of them.
+    /// The panel's outside width. One value for every panel, so a component laid out for one
+    /// fits all of them. A surface inside the gutter uses `contentWidth`.
     static let width: CGFloat = 320
+
+    /// The gutter between the panel's edge and its content.
+    ///
+    /// Named here rather than written as `Spacing.loose` at the one call site that applies it,
+    /// because `contentWidth` has to be derived from the same number.
+    static let contentInset: CGFloat = Spacing.loose
+
+    /// The width a surface is laid out at: the panel's width less the gutter on both sides.
+    ///
+    /// Surfaces state this rather than `width`, and the difference is visible rather than
+    /// pedantic. `padding` followed by `frame(width:)` proposes the narrower width to the
+    /// content but *reports* the clamped one, so a surface insisting on the full `width` was
+    /// drawn edge to edge while the divider and Quit beneath it were inset — the gutter
+    /// cancelled for exactly the regions that fill the panel.
+    static let contentWidth: CGFloat = width - contentInset * 2
 
     /// The tallest a scrolling region inside the panel may be.
     static let maximumScrollHeight: CGFloat = 360
@@ -21,13 +36,25 @@ enum PanelMetrics {
     /// what produces `_NSDetectedLayoutRecursion` — and a `ScrollView` inside a
     /// content-sized panel is reported to lay out correctly on the first open and collapse on
     /// later ones. With every region fixed, neither is reachable.
+    ///
+    /// Its regions add up to 525 at the default text size, so about 23 points go unused at the
+    /// bottom. Deliberate: every region here is a fixed height, so a larger text size grows
+    /// into that margin instead of clipping — and the region it would clip first is the Quit
+    /// button, which an agent-mode app with no Dock icon cannot afford to lose.
     static let height: CGFloat = 548
 
     /// The exact height each panel surface fills, so no surface is content-sized.
     ///
     /// One value for every surface: the list and the create form are the same size, which is
     /// what keeps the panel from changing size when the route changes.
-    static let surfaceHeight: CGFloat = 420
+    ///
+    /// Measured, not guessed. At the default text size the key list surface wants 438 points
+    /// and the create form 383, so this is the taller of the two plus a little headroom. The
+    /// previous 420 clipped the list by 18 points. To re-measure after changing either
+    /// surface, delete `height:` from that surface's own `frame` and render it with
+    /// `ImageRenderer`: a bound frame reports its bound whatever is inside it, which is why
+    /// the panel sizing tests cannot assert this and this comment has to.
+    static let surfaceHeight: CGFloat = 448
 
     /// The bounded height of the key list inside its surface.
     static let keyListHeight: CGFloat = 140
