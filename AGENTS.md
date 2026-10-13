@@ -28,8 +28,10 @@ app/
 │   ├── Types/                              # SSHDirectory, LaunchEnvironment, error enums
 │   ├── FileAccess/                         # SSHDirectoryReading port + FileManager adapter
 │   ├── Resolution/                         # SSHDirectoryResolver
+│   ├── DesignSystem/                       # tokens, styles, components; depends on nothing
 │   ├── MenuBar/                            # status enum, observable model, view
-│   └── Assets.xcassets/
+│   ├── Showcase/                           # TEMPORARY component gallery, removed next spec
+│   └── Assets.xcassets/                    # colour sets backing ColorRole; in both targets
 └── open-ssh-guiTests/                      # Swift Testing, no host application
     └── Support/                            # fakes and scratch-directory helper
 ```
@@ -38,8 +40,13 @@ Directory names map onto the architecture layers. Imports run one way only:
 
 `Types → FileAccess → Resolution → MenuBar → OpenSSHGUIApp`
 
+`DesignSystem/` is a second dependency **root**, like `Types/`: it depends on nothing else in
+the project and is consumed by `MenuBar/` and `Showcase/`. It is deliberately not a link in the
+chain above, because it has no relationship with the SSH layers at all.
+
 A reference that runs the other way is an error, not a style question. In particular nothing
-in `MenuBar/` may reach the file system except through the `FileAccess` port.
+in `MenuBar/` may reach the file system except through the `FileAccess` port, and nothing in
+`DesignSystem/` may name an OpenSSH concept or import any other project directory.
 
 ## Toolchain & build
 
@@ -69,12 +76,23 @@ Do not hand-edit `project.pbxproj` unless there is no alternative; when you must
 one setting at a time and verify with a build. Never commit `xcuserdata/`; do commit
 `xcshareddata/xcschemes/`, since the shared scheme is what gives a fresh clone a test action.
 
-New source files under `open-ssh-gui/` join the app target automatically — the project uses
-`PBXFileSystemSynchronizedRootGroup`, so there are no per-file references to maintain. Target
-membership is expressed as `PBXFileSystemSynchronizedBuildFileExceptionSet` entries listing
-*deviations* from a target's default, which reads as inverted depending on which target owns
-the group; Xcode rewrites these blocks freely, so verify with a build rather than by reading
-the diff. A new *target* still needs real project structure changes.
+New source files under `open-ssh-gui/` join both targets automatically. This is true only
+because the `design-system` spec made it true: when the test target was added, Xcode left the
+app target with *no* `fileSystemSynchronizedGroups` and expressed its membership as an explicit
+per-file list, so for a while new files silently joined the test target and not the app. Both
+targets now share the synchronized root group, and membership exceptions list only
+`OpenSSHGUIApp.swift`, kept out of the test target so the composition root is never compiled
+into the test bundle.
+
+`PBXFileSystemSynchronizedBuildFileExceptionSet` entries list *deviations* from a target's
+default, so they read as exclusions for a target that owns the group and as inclusions for one
+that does not — which is why the old configuration was easy to misread. Xcode rewrites these
+blocks freely.
+
+**A passing build is not evidence that a file is compiled.** A file absent from a target builds
+"successfully" because it is simply not there. To check membership, give the file a deliberate
+type error and confirm the build *fails*. A new *target* still needs real project structure
+changes.
 
 ## Established foundation — read before planning work
 

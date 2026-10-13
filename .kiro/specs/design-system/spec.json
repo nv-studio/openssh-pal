@@ -1,0 +1,22 @@
+{
+  "feature_name": "design-system",
+  "created_at": "2026-09-30T18:24:23Z",
+  "updated_at": "2026-10-06T20:38:47Z",
+  "language": "en",
+  "phase": "implementation-complete",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "ready_for_implementation": true
+}

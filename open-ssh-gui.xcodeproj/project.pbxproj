@@ -12,28 +12,9 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		14E63CA5306D668A0080E692 /* Exceptions for "open-ssh-gui" folder in "open-ssh-gui" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Assets.xcassets,
-				FileAccess/FileSystemSSHDirectoryReader.swift,
-				FileAccess/SSHDirectoryReading.swift,
-				MenuBar/SSHDirectoryStatus.swift,
-				MenuBar/SSHDirectoryStatusModel.swift,
-				MenuBar/SSHDirectoryStatusView.swift,
-				OpenSSHGUIApp.swift,
-				Resolution/SSHDirectoryResolver.swift,
-				Types/FileAccessError.swift,
-				Types/LaunchEnvironment.swift,
-				Types/SSHDirectory.swift,
-				Types/SSHDirectoryResolutionError.swift,
-			);
-			target = 000000000000000100000000 /* open-ssh-gui */;
-		};
 		14E63CA6306D668A0080E692 /* Exceptions for "open-ssh-gui" folder in "open-ssh-guiTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Assets.xcassets,
 				OpenSSHGUIApp.swift,
 			);
 			target = 000000000000000200000000 /* open-ssh-guiTests */;
@@ -49,7 +30,6 @@
 		14E63C8E306D66890080E692 /* open-ssh-gui */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				14E63CA5306D668A0080E692 /* Exceptions for "open-ssh-gui" folder in "open-ssh-gui" target */,
 				14E63CA6306D668A0080E692 /* Exceptions for "open-ssh-gui" folder in "open-ssh-guiTests" target */,
 			);
 			path = "open-ssh-gui";
@@ -101,6 +81,9 @@
 				000000000000000140000000 /* Resources */,
 			);
 			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				14E63C8E306D66890080E692 /* open-ssh-gui */,
 			);
 			name = "open-ssh-gui";
 			productName = MyApp;

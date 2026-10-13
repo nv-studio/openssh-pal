@@ -1,0 +1,85 @@
+import Foundation
+
+/// Fixed dimensions of the menu bar panel.
+///
+/// Exists because the panel sizes itself to its content: any region whose height could vary needs
+/// an explicit bound, and a bound written as a literal at the call site is a bound nobody can find
+/// again. Added rather than reusing `Spacing`, since a width is not a gap.
+enum PanelMetrics {
+
+    /// The panel's outside width. One value for every panel, so a component laid out for one
+    /// fits all of them. A surface inside the gutter uses `contentWidth`.
+    static let width: CGFloat = 320
+
+    /// The gutter between the panel's edge and its content.
+    ///
+    /// Its own number rather than `Spacing.loose`, for two reasons: `contentWidth` has to be
+    /// derived from the same value, and a panel's gutter is not a gap between siblings — it is
+    /// wider than the largest step on the spacing scale, which is why borrowing the scale's top
+    /// step capped it at 16.
+    static let contentInset: CGFloat = 24
+
+    /// The width a surface is laid out at: the panel's width less the gutter on both sides.
+    ///
+    /// Surfaces state this rather than `width`, and the difference is visible rather than
+    /// pedantic. `padding` followed by `frame(width:)` proposes the narrower width to the
+    /// content but *reports* the clamped one, so a surface insisting on the full `width` was
+    /// drawn edge to edge while the divider and Quit beneath it were inset — the gutter
+    /// cancelled for exactly the regions that fill the panel.
+    static let contentWidth: CGFloat = width - contentInset * 2
+
+    /// The tallest a scrolling region inside the panel may be.
+    static let maximumScrollHeight: CGFloat = 360
+
+    /// The panel's exact height.
+    ///
+    /// Exact rather than a maximum, and that is the point. `menuBarExtraStyle(.window)` sizes
+    /// the panel to its content, so a height that could settle after the first layout pass is
+    /// what produces `_NSDetectedLayoutRecursion` — and a `ScrollView` inside a
+    /// content-sized panel is reported to lay out correctly on the first open and collapse on
+    /// later ones. With every region fixed, neither is reachable.
+    ///
+    /// Its regions add up to 541 at the default text size, so about 23 points go unused at the
+    /// bottom. Deliberate: every region here is a fixed height, so a larger text size grows
+    /// into that margin instead of clipping — and the region it would clip first is the Quit
+    /// button, which an agent-mode app with no Dock icon cannot afford to lose. Widening
+    /// `contentInset` has to move this with it, or the gutter is paid for out of that margin.
+    static let height: CGFloat = 564
+
+    /// The exact height each panel surface fills, so no surface is content-sized.
+    ///
+    /// One value for every surface: the list and the create form are the same size, which is
+    /// what keeps the panel from changing size when the route changes.
+    ///
+    /// Measured, not guessed. At the default text size the key list surface wants 438 points
+    /// and the create form 383, so this is the taller of the two plus a little headroom. The
+    /// previous 420 clipped the list by 18 points. Both were re-measured after `contentInset`
+    /// widened and neither moved: every text row in them is line-limited, so a narrower
+    /// surface truncates rather than wrapping into a taller one. To re-measure after changing
+    /// either surface, delete `height:` from that surface's own `frame` and render it with
+    /// `ImageRenderer`: a bound frame reports its bound whatever is inside it, which is why
+    /// the panel sizing tests cannot assert this and this comment has to.
+    static let surfaceHeight: CGFloat = 448
+
+    /// The bounded height of the key list inside its surface.
+    static let keyListHeight: CGFloat = 140
+
+    /// The height reserved for the selected key's attributes.
+    ///
+    /// Reserved whether or not anything is selected, so selecting a key does not move the
+    /// controls beneath it.
+    static let keyDetailHeight: CGFloat = 118
+
+    /// The height reserved for a field's validation message.
+    ///
+    /// Reserved whether or not there is a message, so showing one never changes a field's
+    /// height. A token rather than a literal at each call site, so the two fields that
+    /// reserve it cannot drift apart.
+    static let fieldMessageHeight: CGFloat = 14
+
+    /// The height reserved for the outcome of the last operation.
+    ///
+    /// Reserved whether or not there is an outcome to report, so a confirmation appearing
+    /// never changes the panel's height.
+    static let noticeHeight: CGFloat = 38
+}

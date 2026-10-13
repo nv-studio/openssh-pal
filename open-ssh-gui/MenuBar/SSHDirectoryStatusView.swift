@@ -1,82 +1,31 @@
 import SwiftUI
 
-/// The contents of the menu bar panel.
+/// Which directory the app is pointed at, and whether it can be read.
 ///
-/// Holds no logic and reaches nothing: every string it shows comes from
-/// `SSHDirectoryStatus`, and the only work it triggers is `refresh()` when the panel opens.
+/// A section rather than the panel's whole content: it was the panel until the key list
+/// arrived, and `PanelView` now owns the gutter and the Quit control. Reduced rather than
+/// abandoned, so there is one view that decides how a directory is laid out instead of a live
+/// copy inside the key list and an orphan here that could drift apart.
+///
+/// Holds no logic and reaches nothing: every string comes from `SSHDirectoryStatus`. It
+/// declares no font, radius or colour of its own, and no spacing beyond the gaps between its
+/// own three rows — all of it from the design system, which is what makes a change to the
+/// project's appearance one edit rather than a search through views.
+///
+/// Drives no refresh. The key list's own refresh settles this status first, and a second
+/// `.task` here would re-read the directory on every open for nothing.
 struct SSHDirectoryStatusView: View {
+
     let model: SSHDirectoryStatusModel
 
-    /// Height reserved for the path and indicator rows together.
-    ///
-    /// `menuBarExtraStyle(.window)` hosts this view in a panel that sizes itself to its
-    /// content, and `refresh()` settles `.resolving` into a terminal state while that panel
-    /// is still being laid out. Letting the content change height at that moment makes AppKit
-    /// re-enter layout, which it reports as `_NSDetectedLayoutRecursion`. Reserving the
-    /// worst-case height up front keeps the panel one fixed size, so the state change
-    /// repaints without resizing anything.
-    ///
-    /// Both rows are bounded to two lines, so this covers every state. `@ScaledMetric` keeps
-    /// it correct when the user's text size differs from the default.
-    @ScaledMetric(relativeTo: .body) private var reservedStatusHeight: CGFloat = 70
-
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("SSH directory")
-                .font(.headline)
-
-            // Both rows are always present, so settling out of `.resolving` swaps text rather
-            // than adding or removing views.
-            VStack(alignment: .leading, spacing: 6) {
-                path
-                indicator
-            }
-            .frame(minHeight: reservedStatusHeight, alignment: .topLeading)
-
-            Divider()
-
-            // An agent-mode app has no Dock icon and no menu bar menu of its own, so this is
-            // the user's only way to quit.
-            Button("Quit open-ssh-gui") {
-                NSApplication.shared.terminate(nil)
-            }
-            .keyboardShortcut("q")
+        VStack(alignment: .leading, spacing: Spacing.snug) {
+            SectionHeader(title: "SSH directory")
+            CodeText(text: model.status.displayPath ?? "—", lineLimit: 1)
+            StatusIndicator(role: model.status.statusRole, message: model.status.statusMessage)
         }
-        .padding(12)
-        .frame(width: 320, alignment: .leading)
-        .task { await model.refresh() }
-    }
-
-    /// The resolved directory, or the path an override was rejected for.
-    private var path: some View {
-        Text(model.status.displayPath ?? "—")
-            .font(.system(.body, design: .monospaced))
-            .textSelection(.enabled)
-            .lineLimit(2)
-            .truncationMode(.middle)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    /// Reachability, or the reason in its place when the directory cannot be reached.
-    private var indicator: some View {
-        let status = model.status
-
-        return Group {
-            if let reason = status.failureReason {
-                Label(reason, systemImage: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.orange)
-            } else if status.isReachable {
-                Label("Reachable", systemImage: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-            } else {
-                Label("Resolving…", systemImage: "ellipsis.circle")
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .font(.callout)
-        .lineLimit(2)
-        .fixedSize(horizontal: false, vertical: true)
+        // Fills the surface so the path and the indicator start at the same edge as everything
+        // below them, instead of being centred on their own intrinsic width.
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

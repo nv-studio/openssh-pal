@@ -1,0 +1,22 @@
+{
+  "feature_name": "crud-ssh-keys",
+  "created_at": "2026-09-30T18:53:13Z",
+  "updated_at": "2026-10-11T11:45:28Z",
+  "language": "en",
+  "phase": "tasks-generated",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "ready_for_implementation": false
+}
