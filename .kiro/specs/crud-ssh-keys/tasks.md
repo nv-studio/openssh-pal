@@ -356,13 +356,19 @@ result rendered through `ImageRenderer`. Done once, by hand, at the default text
 | Key list, 1 to 12 keys | 438 | 448 |
 | Key list, empty | 310 | 448 |
 | Create form | 383 | 448 |
-| Whole panel | 525 | 548 |
+| Whole panel | 541 | 564 |
 
 `surfaceHeight` was 420 and clipped the key list by 18 points; it is now 448. The panel's
 remaining 23 points are deliberate headroom, because every region is a fixed height and a
 larger text size has to grow into something — the first region it would otherwise clip is
 Quit. **This is the number 6.3's increased-text-size check is really testing**, and it is
 the one measurement that will need redoing whenever either surface gains a row.
+
+Re-measured after `contentInset` widened to 24, which took the content width to 272. Neither
+surface moved: every text row in them is line-limited, so a narrower surface truncates rather
+than wrapping into a taller one. The panel itself grew by the 16 points of padding it gained,
+and `height` moved with it — a wider gutter paid for out of the headroom would be a gutter
+that clips Quit at a larger text size.
 
 ### What is left to do, by hand
 

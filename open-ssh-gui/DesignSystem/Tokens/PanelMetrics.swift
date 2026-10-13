@@ -13,9 +13,11 @@ enum PanelMetrics {
 
     /// The gutter between the panel's edge and its content.
     ///
-    /// Named here rather than written as `Spacing.loose` at the one call site that applies it,
-    /// because `contentWidth` has to be derived from the same number.
-    static let contentInset: CGFloat = Spacing.loose
+    /// Its own number rather than `Spacing.loose`, for two reasons: `contentWidth` has to be
+    /// derived from the same value, and a panel's gutter is not a gap between siblings — it is
+    /// wider than the largest step on the spacing scale, which is why borrowing the scale's top
+    /// step capped it at 16.
+    static let contentInset: CGFloat = 24
 
     /// The width a surface is laid out at: the panel's width less the gutter on both sides.
     ///
@@ -37,11 +39,12 @@ enum PanelMetrics {
     /// content-sized panel is reported to lay out correctly on the first open and collapse on
     /// later ones. With every region fixed, neither is reachable.
     ///
-    /// Its regions add up to 525 at the default text size, so about 23 points go unused at the
+    /// Its regions add up to 541 at the default text size, so about 23 points go unused at the
     /// bottom. Deliberate: every region here is a fixed height, so a larger text size grows
     /// into that margin instead of clipping — and the region it would clip first is the Quit
-    /// button, which an agent-mode app with no Dock icon cannot afford to lose.
-    static let height: CGFloat = 548
+    /// button, which an agent-mode app with no Dock icon cannot afford to lose. Widening
+    /// `contentInset` has to move this with it, or the gutter is paid for out of that margin.
+    static let height: CGFloat = 564
 
     /// The exact height each panel surface fills, so no surface is content-sized.
     ///
@@ -50,8 +53,10 @@ enum PanelMetrics {
     ///
     /// Measured, not guessed. At the default text size the key list surface wants 438 points
     /// and the create form 383, so this is the taller of the two plus a little headroom. The
-    /// previous 420 clipped the list by 18 points. To re-measure after changing either
-    /// surface, delete `height:` from that surface's own `frame` and render it with
+    /// previous 420 clipped the list by 18 points. Both were re-measured after `contentInset`
+    /// widened and neither moved: every text row in them is line-limited, so a narrower
+    /// surface truncates rather than wrapping into a taller one. To re-measure after changing
+    /// either surface, delete `height:` from that surface's own `frame` and render it with
     /// `ImageRenderer`: a bound frame reports its bound whatever is inside it, which is why
     /// the panel sizing tests cannot assert this and this comment has to.
     static let surfaceHeight: CGFloat = 448
