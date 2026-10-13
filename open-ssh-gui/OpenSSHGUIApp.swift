@@ -76,6 +76,16 @@ struct OpenSSHGUIApp: App {
     var body: some Scene {
         MenuBarExtra("open-ssh-gui", systemImage: "key") {
             PanelView(status: status, keys: keys, form: newKey)
+                .background(
+                                    LinearGradient(
+                                        colors: [
+                                            Color(nsColor: NSColor(calibratedRed: 0.08, green: 0.09, blue: 0.11, alpha: 1.0)),
+                                            Color(nsColor: NSColor(calibratedRed: 0.05, green: 0.18, blue: 0.12, alpha: 1.0))
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
                 // Applied once, here, and inherited by every descendant control. This is the
                 // line that makes the project's appearance impossible for a later call site
                 // to bypass: a plain `Button` written anywhere below picks it up without
