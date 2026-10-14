@@ -9,7 +9,7 @@ struct NewKeyFormView: View {
 
     @Bindable var model: NewKeyFormModel
 
-    /// Asks the panel to go back to the list. The route is the panel's to own.
+    /// Asks the panel to go back to the Keys tab. The tab is the panel's to own.
     let onCancel: () -> Void
 
     var body: some View {
@@ -113,7 +113,7 @@ struct NewKeyFormView: View {
                     model.cancel()
                     onCancel()
                 }
-                .accessibilityLabel("Cancel and return to the key list")
+                .accessibilityLabel("Cancel and return to the Keys tab")
 
                 Spacer(minLength: 0)
 

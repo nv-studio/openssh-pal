@@ -3,7 +3,7 @@
 /// A closed set, so "reachable and failing" is not expressible. Each case projects both an icon
 /// and a colour role: relying on colour alone would make the states indistinguishable to a user
 /// who cannot separate them, which is why the icons are asserted to be distinct too.
-enum StatusRole: Sendable, Hashable, CaseIterable {
+nonisolated enum StatusRole: Sendable, Hashable, CaseIterable {
 
     /// The operation succeeded, or the resource is reachable.
     case success

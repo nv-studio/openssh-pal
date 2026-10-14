@@ -46,6 +46,11 @@ final class SSHKeyListModel {
     private let writer: SSHKeyWriting
     private let clipboard: ClipboardWriting
 
+    /// Which hosts name a key. A protocol rather than the configuration model, so the two
+    /// models never refer to each other — and with no default, so key management cannot
+    /// silently claim no host uses a key because nobody wired the lookup in.
+    private let hostReferences: HostReferenceLookup
+
     private let discovery = SSHKeyDiscovery()
     private let parser = SSHPublicKeyParser()
     private let validator = SSHKeyNameValidator()
@@ -62,12 +67,14 @@ final class SSHKeyListModel {
         status: SSHDirectoryStatusModel,
         reader: SSHDirectoryReading,
         writer: SSHKeyWriting,
-        clipboard: ClipboardWriting
+        clipboard: ClipboardWriting,
+        hostReferences: HostReferenceLookup
     ) {
         self.status = status
         self.reader = reader
         self.writer = writer
         self.clipboard = clipboard
+        self.hostReferences = hostReferences
     }
 
     // MARK: - Enumeration
@@ -215,11 +222,12 @@ final class SSHKeyListModel {
         return "Rename \(renamingPair?.displayName ?? "")?"
     }
 
-    /// The warning itself, naming both paths.
+    /// The warning itself, naming both paths and the hosts whose `IdentityFile` names the key.
     ///
     /// The app does not update what points at a key — `IdentityFile` lines, scripts,
     /// `ssh-add` invocations, anything in a CI configuration — so it says so, and names the
-    /// two paths rather than leaving the user to work out what changed.
+    /// two paths rather than leaving the user to work out what changed. It never changes a
+    /// configuration file either: the hosts are named so the user can.
     var renameWarningMessage: String? {
         guard case .success(let newName) = renameOutcome,
               let pair = renamingPair,
@@ -232,7 +240,8 @@ final class SSHKeyListModel {
         return """
             References to this key are not updated: \
             \(from.path(percentEncoded: false)) becomes \(to.path(percentEncoded: false)). \
-            Anything naming the old path — ssh_config, scripts, ssh-agent — keeps pointing at it.
+            Anything naming the old path — ssh_config, scripts, ssh-agent — keeps pointing at it. \
+            \(hostReferences.hostReferences(to: pair).summary)
             """
     }
 
@@ -303,12 +312,14 @@ final class SSHKeyListModel {
         "Delete \(pair.displayName)?"
     }
 
-    /// The confirmation's message, naming the pair and stating that the removal is final.
+    /// The confirmation's message, naming the pair, stating that the removal is final, and
+    /// naming the hosts that would lose their key.
     func deletionMessage(for pair: SSHKeyPair) -> String {
         let files = pair.location.files.map(\.lastPathComponent).joined(separator: ", ")
         return """
             \(pair.displayName) and its files (\(files)) are removed permanently. \
-            This cannot be undone — there is no Trash and no backup.
+            This cannot be undone — there is no Trash and no backup. \
+            \(hostReferences.hostReferences(to: pair).summary)
             """
     }
 

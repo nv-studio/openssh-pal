@@ -13,7 +13,7 @@ struct SSHDirectoryResolver {
 
     /// The name of the SSH directory inside the home directory. Nothing else in the app
     /// knows this string.
-    static let directoryName = ".ssh"
+    nonisolated static let directoryName = ".ssh"
 
     private let reader: SSHDirectoryReading
 

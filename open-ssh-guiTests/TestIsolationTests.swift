@@ -18,7 +18,9 @@ nonisolated struct TestIsolationTests {
 
     @Test("No test source reaches for the user's home directory")
     func noTestReachesForTheHomeDirectory() throws {
-        let forbidden = ["NSHomeDirectory", "homeDirectoryForCurrentUser"]
+        // Spelled in pieces: written whole, this list is itself a test source naming both
+        // symbols, and the check failed on its own file.
+        let forbidden = ["NSHome" + "Directory", "homeDirectory" + "ForCurrentUser"]
 
         for source in try ProjectSources.tests() {
             for symbol in forbidden {
@@ -39,6 +41,20 @@ nonisolated struct TestIsolationTests {
             #expect(
                 !source.text.contains("\".ssh\""),
                 "\(source.relativePath) spells the SSH directory name as a literal"
+            )
+        }
+    }
+
+    @Test("No test string literal spells a tilde path into the SSH directory")
+    func noTestSpellsTheTildeSSHPath() throws {
+        // A configuration fixture with this path would read as the developer's own directory
+        // to anyone resolving it. Tests build it from the resolver's constant instead. Only a
+        // literal is matched — prose in a comment naming the directory is not a path.
+        let tildePath = "\"~/" + "." + "ssh"
+        for source in try ProjectSources.tests() {
+            #expect(
+                !source.text.contains(tildePath),
+                "\(source.relativePath) spells \(tildePath): \(source.lines(containing: tildePath))"
             )
         }
     }

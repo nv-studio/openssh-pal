@@ -6,8 +6,10 @@ import SwiftUI
 /// every appearance decision from the design system — there is not a font, spacing, radius or
 /// colour literal anywhere below.
 ///
-/// The surface is an exact height, so switching to the create form cannot change the panel's
-/// size.
+/// The surface is an exact height, so switching to another tab cannot change the panel's size.
+///
+/// Creating a key is the New Key tab's job, and refreshing is the panel's: it re-reads on every
+/// open, for every tab at once.
 struct SSHKeyListView: View {
 
     @Bindable var model: SSHKeyListModel
@@ -16,9 +18,6 @@ struct SSHKeyListView: View {
     /// are in, especially under a launch override. Rendered by `SSHDirectoryStatusView`
     /// rather than rebuilt here, so one view decides how a directory is laid out.
     let status: SSHDirectoryStatusModel
-
-    /// Asks the panel to show the create form. The route is the panel's to own.
-    let onCreate: () -> Void
 
     @State private var selection: SSHKeyName?
 
@@ -33,7 +32,6 @@ struct SSHKeyListView: View {
             Spacer(minLength: 0)
         }
         .frame(width: PanelMetrics.contentWidth, height: PanelMetrics.surfaceHeight, alignment: .top)
-        .task { await model.refresh() }
     }
 
     // MARK: - The keys
@@ -129,12 +127,6 @@ struct SSHKeyListView: View {
                 }
 
                 Spacer(minLength: 0)
-
-                Button("New key") { onCreate() }
-                    // Offered only once a directory has resolved: there is nowhere to write
-                    // a key until then, and there is deliberately no fallback.
-                    .disabled(model.resolvedDirectory == nil)
-                    .accessibilityLabel("Create a new key pair")
             }
             .disabled(model.operation.isInFlight)
         }

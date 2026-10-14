@@ -6,7 +6,7 @@ import Foundation
 /// without coordination. Nothing in it touches the file system, which is what lets the
 /// suite exercise every resolution and status rule without going near a real SSH
 /// directory.
-struct InMemorySSHDirectoryReader: SSHDirectoryReading {
+nonisolated struct InMemorySSHDirectoryReader: SSHDirectoryReading {
 
     /// Fabricated directories and the entries each one lists.
     private let directories: [String: [URL]]
@@ -51,7 +51,7 @@ struct InMemorySSHDirectoryReader: SSHDirectoryReading {
     }
 }
 
-extension URL {
+nonisolated extension URL {
     /// A comparison key that treats `/a/b` and `/a/b/` as the same location, so a caller
     /// need not match the exact spelling a fixture was written with.
     fileprivate var normalizedPath: String {
@@ -61,7 +61,7 @@ extension URL {
     }
 }
 
-extension Dictionary where Key == URL {
+nonisolated extension Dictionary where Key == URL {
     fileprivate func keyedByNormalizedPath() -> [String: Value] {
         Dictionary<String, Value>(
             map { ($0.key.normalizedPath, $0.value) },

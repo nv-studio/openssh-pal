@@ -39,12 +39,24 @@ enum PanelMetrics {
     /// content-sized panel is reported to lay out correctly on the first open and collapse on
     /// later ones. With every region fixed, neither is reachable.
     ///
+    /// The tab bar's height and the gap below it on top of `heightWithoutTabBar`, so adding the
+    /// tab bar takes nothing from any surface or from the bottom margin.
+    static let height: CGFloat = heightWithoutTabBar + tabBarHeight + Spacing.regular
+
+    /// The panel's height before it had a tab bar.
+    ///
     /// Its regions add up to 541 at the default text size, so about 23 points go unused at the
     /// bottom. Deliberate: every region here is a fixed height, so a larger text size grows
     /// into that margin instead of clipping — and the region it would clip first is the Quit
     /// button, which an agent-mode app with no Dock icon cannot afford to lose. Widening
     /// `contentInset` has to move this with it, or the gutter is paid for out of that margin.
-    static let height: CGFloat = 564
+    static let heightWithoutTabBar: CGFloat = 564
+
+    /// The height of the tab bar at the top of the panel.
+    ///
+    /// A segmented control is about 22 points tall at the default text size; the rest is room
+    /// for it to grow with the user's text size without moving the surface below it.
+    static let tabBarHeight: CGFloat = 28
 
     /// The exact height each panel surface fills, so no surface is content-sized.
     ///
@@ -63,6 +75,23 @@ enum PanelMetrics {
 
     /// The bounded height of the key list inside its surface.
     static let keyListHeight: CGFloat = 140
+
+    /// The bounded height of the host list inside its surface.
+    ///
+    /// Measured the way `surfaceHeight` describes: with twelve hosts and a load issue, the host
+    /// list surface wants 355 points and the host form 443, at the default and the largest text
+    /// size alike. Both fit `surfaceHeight`, the list with room for the delete confirmation to
+    /// open beneath it; the form's fields scroll.
+    static let hostListHeight: CGFloat = 132
+
+    /// The height reserved for the selected host's attributes, keys and file.
+    ///
+    /// Reserved whether or not anything is selected, so selecting a host does not move the
+    /// controls beneath it.
+    static let hostDetailHeight: CGFloat = 112
+
+    /// The bounded height of the key picker inside the host form.
+    static let keyPickerHeight: CGFloat = 104
 
     /// The height reserved for the selected key's attributes.
     ///

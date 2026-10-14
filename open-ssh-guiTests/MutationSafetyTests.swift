@@ -53,7 +53,8 @@ struct MutationSafetyTests {
             ),
             reader: reader,
             writer: writer,
-            clipboard: RecordingClipboardWriter()
+            clipboard: RecordingClipboardWriter(),
+            hostReferences: StaticHostReferenceLookup(report: .references(hosts: [], hasUnresolved: false))
         )
     }
 
@@ -218,7 +219,8 @@ struct MutationSafetyTests {
                 ),
                 reader: reader,
                 writer: FileSystemSSHKeyWriter(),
-                clipboard: RecordingClipboardWriter()
+                clipboard: RecordingClipboardWriter(),
+                hostReferences: StaticHostReferenceLookup(report: .references(hosts: [], hasUnresolved: false))
             )
             await model.refresh()
 

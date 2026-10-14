@@ -4,7 +4,7 @@
 /// assert on. The rendered colour is unobservable from a test, so the *decision* — which role a
 /// state deserves — is what gets verified, and `ColorRoleAppearance` is the only place that turns
 /// a role into something drawable.
-enum ColorRole: Sendable, Hashable, CaseIterable {
+nonisolated enum ColorRole: Sendable, Hashable, CaseIterable {
 
     /// Body text and a control's own label.
     case primaryText

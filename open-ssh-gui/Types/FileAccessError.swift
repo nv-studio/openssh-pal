@@ -4,7 +4,7 @@ import Foundation
 ///
 /// Absence and permission denial are separate cases because the user needs to know which
 /// of the two occurred; a plain existence check cannot tell them apart.
-enum FileAccessError: Error, Equatable, Sendable {
+nonisolated enum FileAccessError: Error, Equatable, Sendable {
     case directoryNotFound(URL)
     case accessDenied(URL)
     case unreadable(URL)

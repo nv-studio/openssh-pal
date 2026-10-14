@@ -53,7 +53,8 @@ struct KeyMaterialSafetyTests {
             ),
             reader: reader,
             writer: writer,
-            clipboard: clipboard
+            clipboard: clipboard,
+            hostReferences: StaticHostReferenceLookup(report: .references(hosts: [], hasUnresolved: false))
         )
 
         // Everything the feature can be asked to do, in one pass.

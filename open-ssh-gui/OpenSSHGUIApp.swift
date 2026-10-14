@@ -17,8 +17,10 @@ struct OpenSSHGUIApp: App {
     /// rather than rebuilding them — which is what makes the status model's memoized
     /// resolution meaningful, and what lets a generation outlive a panel dismissal.
     @State private var status: SSHDirectoryStatusModel
+    @State private var configuration: SSHConfigModel
     @State private var keys: SSHKeyListModel
     @State private var newKey: NewKeyFormModel
+    @State private var hostForm: HostFormModel
 
     /// Where `ssh-keygen` lives.
     ///
@@ -43,12 +45,32 @@ struct OpenSSHGUIApp: App {
 
         self.status = status
 
-        keys = SSHKeyListModel(
+        // Constructed before the key list, which consumes it as its host-reference lookup.
+        // Neither model refers to the other's type, so there is no cycle to break.
+        let configuration = SSHConfigModel(
+            status: status,
+            reader: reader,
+            writer: FileSystemSSHConfigWriter(),
+            homeDirectory: FileManager.default.homeDirectoryForCurrentUser,
+            userName: NSUserName()
+        )
+        self.configuration = configuration
+
+        let keys = SSHKeyListModel(
             status: status,
             reader: reader,
             writer: writer,
-            clipboard: PasteboardClipboardWriter()
+            clipboard: PasteboardClipboardWriter(),
+            hostReferences: configuration
         )
+        self.keys = keys
+        hostForm = HostFormModel(configuration: configuration, keys: keys)
+
+        // The configuration is read at launch rather than on the first panel open, so the hosts
+        // are there when the panel first appears. The refresh resolves the directory first and
+        // reads nothing until it has — so an override is honoured, and a rejected one is never
+        // replaced by the home directory.
+        Task { await configuration.refresh() }
 
         newKey = NewKeyFormModel(
             generator: ProcessSSHKeyGenerator(
@@ -75,7 +97,7 @@ struct OpenSSHGUIApp: App {
 
     var body: some Scene {
         MenuBarExtra("open-ssh-gui", systemImage: "key") {
-            PanelView(status: status, keys: keys, form: newKey)
+            PanelView(status: status, keys: keys, newKey: newKey, configuration: configuration, hostForm: hostForm)
                 .background(
                                     LinearGradient(
                                         colors: [

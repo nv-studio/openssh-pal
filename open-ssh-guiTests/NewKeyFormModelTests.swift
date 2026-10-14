@@ -308,6 +308,48 @@ struct NewKeyFormModelTests {
         #expect(generator.directories == [Self.directory])
     }
 
+    // MARK: - crud-ssh-config-hosts 10.8 / 10.9 leaving the tab
+
+    @Test("Discarding drops the entered values and the passphrase without completing the form")
+    func discardDropsEverything() {
+        let form = Self.form()
+        form.name = "work_key"
+        form.passphraseText = "hunter2"
+        form.confirmationText = "hunter2"
+        form.revealPassphrase()
+
+        form.discard()
+
+        #expect(form.passphrase == .none)
+        #expect(form.confirmation == .none)
+        #expect(!form.isPassphraseRevealed)
+        #expect(form.name.isEmpty)
+        #expect(form.failureReason == nil)
+        // Not `.cancelled`: a completion would make the panel switch back to the Keys tab.
+        #expect(form.completion == nil)
+        #expect(!form.canGenerate)
+    }
+
+    @Test("Discarding while a generation runs neither cancels it nor loses its outcome")
+    func discardDuringGenerationKeepsIt() async {
+        let generator = StubSSHKeyGenerator(outcome: .success(Self.pair("work_key")))
+        generator.hold()
+        let form = Self.form(generator: generator)
+        form.name = "work_key"
+
+        form.submit()
+        await Task.yield()
+        form.discard()
+
+        #expect(form.isGenerating)
+
+        generator.release()
+        await form.waitForGeneration()
+
+        #expect(form.completion == .created(Self.pair("work_key")))
+        #expect(generator.callCount == 1)
+    }
+
     // MARK: - 9.3 while generation runs
 
     @Test("While generation runs the form reports progress and refuses a second submission")

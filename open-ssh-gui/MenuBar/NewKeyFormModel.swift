@@ -101,6 +101,25 @@ final class NewKeyFormModel {
         completion = .cancelled
     }
 
+    /// Leaves the form without finishing it: what the user leaving its tab means.
+    ///
+    /// Unlike `cancel()`, this produces no completion, because the panel adopts a completion by
+    /// switching to the Keys tab — which would yank the user away from the tab they just chose.
+    ///
+    /// Does nothing while a generation runs. The generation is the model's own task and must
+    /// finish, and its outcome must still be there when the user comes back; dropping the form's
+    /// state now would lose it.
+    func discard() {
+        guard !isGenerating else { return }
+        directory = nil
+        entries = []
+        name = ""
+        comment = ""
+        type = .default
+        clearSecrets()
+        failureReason = nil
+    }
+
     /// Drops both secrets and the reveal flag.
     ///
     /// This is the whole of what "retain no reference" can mean for a value type — see

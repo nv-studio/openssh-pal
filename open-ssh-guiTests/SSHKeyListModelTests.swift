@@ -31,7 +31,8 @@ struct SSHKeyListModelTests {
         failures: [URL: FileAccessError] = [:],
         directoryExists: Bool = true,
         writer: InMemorySSHKeyWriter = InMemorySSHKeyWriter(),
-        clipboard: RecordingClipboardWriter = RecordingClipboardWriter()
+        clipboard: RecordingClipboardWriter = RecordingClipboardWriter(),
+        references: HostReferenceLookup? = nil
     ) -> SSHKeyListModel {
         let reader = InMemorySSHDirectoryReader(
             directories: directoryExists ? [keys: entries.map(file)] : [:],
@@ -48,7 +49,8 @@ struct SSHKeyListModelTests {
             ),
             reader: reader,
             writer: writer,
-            clipboard: clipboard
+            clipboard: clipboard,
+            hostReferences: references ?? StaticHostReferenceLookup(report: .references(hosts: [], hasUnresolved: false))
         )
     }
 
@@ -56,7 +58,8 @@ struct SSHKeyListModelTests {
     private static func modelWithOnePair(
         writer: InMemorySSHKeyWriter = InMemorySSHKeyWriter(),
         clipboard: RecordingClipboardWriter = RecordingClipboardWriter(),
-        certificate: Bool = false
+        certificate: Bool = false,
+        references: HostReferenceLookup? = nil
     ) -> SSHKeyListModel {
         var entries = ["work_key", "work_key.pub"]
         if certificate { entries.append("work_key-cert.pub") }
@@ -65,7 +68,8 @@ struct SSHKeyListModelTests {
             entries: entries,
             contents: ["work_key.pub": ed25519Line + "\n"],
             writer: writer,
-            clipboard: clipboard
+            clipboard: clipboard,
+            references: references
         )
     }
 
@@ -346,6 +350,55 @@ struct SSHKeyListModelTests {
         model.renameProposal = "config"
 
         #expect(model.renameWarningMessage == nil)
+    }
+
+    // MARK: - crud-ssh-config-hosts 11.1–11.4 host references
+
+    @Test("The rename warning lists the hosts whose IdentityFile names the key")
+    func renameWarningNamesReferencingHosts() async throws {
+        let lookup = StaticHostReferenceLookup(report: .references(hosts: ["github.com", "bastion"], hasUnresolved: false))
+        let model = Self.modelWithOnePair(references: lookup)
+        await model.refresh()
+        model.beginRename(of: try #require(model.state.pairs.first))
+        model.renameProposal = "renamed_key"
+
+        let message = try #require(model.renameWarningMessage)
+        #expect(message.contains("github.com, bastion"))
+        #expect(lookup.askedAbout == [SSHKeyName.discovered("work_key")!])
+    }
+
+    @Test("The deletion confirmation lists the referencing hosts")
+    func deletionNamesReferencingHosts() async throws {
+        let model = Self.modelWithOnePair(
+            references: StaticHostReferenceLookup(report: .references(hosts: ["github.com"], hasUnresolved: false))
+        )
+        await model.refresh()
+
+        #expect(model.deletionMessage(for: try #require(model.state.pairs.first)).contains("github.com"))
+    }
+
+    @Test("Unresolved references are stated as possibly naming the key")
+    func unresolvedReferencesAreStated() async throws {
+        let model = Self.modelWithOnePair(
+            references: StaticHostReferenceLookup(report: .references(hosts: [], hasUnresolved: true))
+        )
+        await model.refresh()
+        let pair = try #require(model.state.pairs.first)
+
+        #expect(model.deletionMessage(for: pair).localizedCaseInsensitiveContains("could not be resolved"))
+    }
+
+    @Test("A configuration that could not be read is stated, never presented as no hosts")
+    func unavailableReferencesAreStated() async throws {
+        let model = Self.modelWithOnePair(
+            references: StaticHostReferenceLookup(report: .unavailable(reason: "Permission denied: config"))
+        )
+        await model.refresh()
+        let pair = try #require(model.state.pairs.first)
+        let message = model.deletionMessage(for: pair)
+
+        #expect(message.localizedCaseInsensitiveContains("could not be checked"))
+        #expect(!message.contains("No host"))
     }
 
     // MARK: - 4.2 / 4.3 renaming: execution

@@ -4,7 +4,7 @@ import Foundation
 ///
 /// Only an explicit override can fail resolution. An absent default SSH directory is a
 /// legitimate first-run state and surfaces as `FileAccessError.directoryNotFound` instead.
-enum SSHDirectoryResolutionError: Error, Equatable, Sendable {
+nonisolated enum SSHDirectoryResolutionError: Error, Equatable, Sendable {
     case overridePathDoesNotExist(URL)
     case overridePathIsNotADirectory(URL)
 
