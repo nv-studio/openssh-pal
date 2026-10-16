@@ -13,7 +13,7 @@ struct PasteboardClipboardWriterTests {
     private static func withPasteboard<T>(
         perform body: (NSPasteboard) async throws -> T
     ) async throws -> T {
-        let pasteboard = NSPasteboard(name: NSPasteboard.Name("open-ssh-gui-tests-\(UUID().uuidString)"))
+        let pasteboard = NSPasteboard(name: NSPasteboard.Name("openssh-pal-tests-\(UUID().uuidString)"))
         defer { pasteboard.releaseGlobally() }
         return try await body(pasteboard)
     }

@@ -96,7 +96,7 @@ struct OpenSSHGUIApp: App {
     }
 
     var body: some Scene {
-        MenuBarExtra("open-ssh-gui", systemImage: "key") {
+        MenuBarExtra("openssh-pal", systemImage: "key") {
             PanelView(status: status, keys: keys, newKey: newKey, configuration: configuration, hostForm: hostForm)
                 .background(
                                     LinearGradient(

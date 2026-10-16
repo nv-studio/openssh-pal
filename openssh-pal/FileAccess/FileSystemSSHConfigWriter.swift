@@ -21,7 +21,7 @@ nonisolated struct FileSystemSSHConfigWriter: SSHConfigWriting {
     /// Part of every temporary file's name. A crash between writing one and renaming it leaves
     /// it behind; its leading dot keeps an `Include` glob from reading it, and it is not cleaned
     /// up automatically because deleting a file the app cannot prove it wrote is worse.
-    static let temporaryMarker = ".open-ssh-gui-tmp-"
+    static let temporaryMarker = ".openssh-pal-tmp-"
 
     /// Owner read and write, which OpenSSH requires of a configuration file it did not create.
     static let ownerOnly: mode_t = 0o600

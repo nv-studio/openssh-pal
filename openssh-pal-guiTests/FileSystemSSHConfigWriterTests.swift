@@ -191,7 +191,7 @@ struct FileSystemSSHConfigWriterTests {
         try await TemporaryDirectory.withOne { scratch in
             let layout = try Layout(scratch)
             let config = try layout.write("Host original\n", to: "config", mode: 0o644)
-            let backup = layout.ssh.appending(path: ".config.open-ssh-gui-backup")
+            let backup = layout.ssh.appending(path: ".config.openssh-pal-backup")
 
             #expect(try await Self.writer.backUpIfAbsent(config, to: backup, within: layout.directory) == .created)
             #expect(try Self.text(of: backup) == "Host original\n")

@@ -34,10 +34,10 @@ nonisolated struct GlobPatternTests {
 
     @Test("A leading dot is matched only by a pattern that starts with a dot")
     func leadingDot() {
-        #expect(!GlobPattern("*").matches(".config.open-ssh-gui-backup"))
+        #expect(!GlobPattern("*").matches(".config.openssh-pal-backup"))
         #expect(!GlobPattern("?config").matches(".config"))
         #expect(!GlobPattern("[.]config").matches(".config"))
-        #expect(GlobPattern(".*").matches(".config.open-ssh-gui-backup"))
+        #expect(GlobPattern(".*").matches(".config.openssh-pal-backup"))
         #expect(GlobPattern(".config").matches(".config"))
     }
 

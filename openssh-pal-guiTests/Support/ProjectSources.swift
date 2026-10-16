@@ -15,12 +15,12 @@ nonisolated enum ProjectSources {
 
     /// The application's source files.
     static func application() throws -> [Source] {
-        try sources(in: root().appending(path: "open-ssh-gui", directoryHint: .isDirectory))
+        try sources(in: root().appending(path: "openssh-pal", directoryHint: .isDirectory))
     }
 
     /// The test target's source files.
     static func tests() throws -> [Source] {
-        try sources(in: root().appending(path: "open-ssh-guiTests", directoryHint: .isDirectory))
+        try sources(in: root().appending(path: "openssh-palTests", directoryHint: .isDirectory))
     }
 
     struct Source {
@@ -46,9 +46,9 @@ nonisolated enum ProjectSources {
 
     /// The project root, derived from this file's location rather than from any environment.
     private static func root() -> URL {
-        URL(filePath: #filePath)            // .../open-ssh-guiTests/Support/ProjectSources.swift
-            .deletingLastPathComponent()    // .../open-ssh-guiTests/Support
-            .deletingLastPathComponent()    // .../open-ssh-guiTests
+        URL(filePath: #filePath)            // .../openssh-palTests/Support/ProjectSources.swift
+            .deletingLastPathComponent()    // .../openssh-palTests/Support
+            .deletingLastPathComponent()    // .../openssh-palTests
             .deletingLastPathComponent()    // the project root
     }
 

@@ -66,8 +66,8 @@ nonisolated struct TestIsolationTests {
         for source in try ProjectSources.application() {
             guard source.text.contains(".processInfo") else { continue }
             #expect(
-                source.relativePath == "open-ssh-gui/OpenSSHGUIApp.swift"
-                    || source.isIn("open-ssh-gui/Platform"),
+                source.relativePath == "openssh-pal/OpenSSHGUIApp.swift"
+                    || source.isIn("openssh-pal/Platform"),
                 "\(source.relativePath) reads ProcessInfo outside the composition root"
             )
         }

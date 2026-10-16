@@ -262,10 +262,10 @@ struct ConfigMutationSafetyTests {
             "fo" + "pen(", "real" + "path(", "O_" + "CREAT", "File" + "Manager",
         ]
 
-        for source in try ProjectSources.application() where !source.isIn("open-ssh-gui/FileAccess") {
+        for source in try ProjectSources.application() where !source.isIn("openssh-pal/FileAccess") {
             for call in calls where source.text.contains(call) {
                 #expect(
-                    call == "File" + "Manager" && source.relativePath == "open-ssh-gui/OpenSSHGUIApp.swift",
+                    call == "File" + "Manager" && source.relativePath == "openssh-pal/OpenSSHGUIApp.swift",
                     "\(source.relativePath) calls \(call): \(source.lines(containing: call))"
                 )
             }

@@ -10,7 +10,7 @@ import Foundation
 /// Pure.
 nonisolated struct ConfigBackupLocation {
 
-    static let suffix = ".open-ssh-gui-backup"
+    static let suffix = ".openssh-pal-backup"
 
     init() {}
 

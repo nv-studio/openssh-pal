@@ -6,7 +6,7 @@ struct LaunchEnvironmentTests {
 
     @Test("With neither channel set there is no override")
     func noChannelsYieldsNoOverride() {
-        let environment = LaunchEnvironment(arguments: ["open-ssh-gui"], environmentVariables: [:])
+        let environment = LaunchEnvironment(arguments: ["openssh-pal"], environmentVariables: [:])
 
         #expect(environment.overridePath == nil)
     }
@@ -14,7 +14,7 @@ struct LaunchEnvironmentTests {
     @Test("The launch argument supplies the override")
     func launchArgumentSuppliesOverride() {
         let environment = LaunchEnvironment(
-            arguments: ["open-ssh-gui", LaunchEnvironment.overrideArgument, "/fabricated/scratch"],
+            arguments: ["openssh-pal", LaunchEnvironment.overrideArgument, "/fabricated/scratch"],
             environmentVariables: [:]
         )
 
@@ -24,7 +24,7 @@ struct LaunchEnvironmentTests {
     @Test("The environment variable supplies the override when no argument is present")
     func environmentVariableSuppliesOverride() {
         let environment = LaunchEnvironment(
-            arguments: ["open-ssh-gui"],
+            arguments: ["openssh-pal"],
             environmentVariables: [LaunchEnvironment.overrideVariable: "/fabricated/from-variable"]
         )
 
@@ -34,7 +34,7 @@ struct LaunchEnvironmentTests {
     @Test("The launch argument beats the environment variable")
     func launchArgumentBeatsEnvironmentVariable() {
         let environment = LaunchEnvironment(
-            arguments: ["open-ssh-gui", LaunchEnvironment.overrideArgument, "/fabricated/from-argument"],
+            arguments: ["openssh-pal", LaunchEnvironment.overrideArgument, "/fabricated/from-argument"],
             environmentVariables: [LaunchEnvironment.overrideVariable: "/fabricated/from-variable"]
         )
 
@@ -44,7 +44,7 @@ struct LaunchEnvironmentTests {
     @Test("A trailing override flag with no value is malformed, not an empty path")
     func trailingFlagWithoutValueIsMalformed() {
         let environment = LaunchEnvironment(
-            arguments: ["open-ssh-gui", LaunchEnvironment.overrideArgument],
+            arguments: ["openssh-pal", LaunchEnvironment.overrideArgument],
             environmentVariables: [:]
         )
 
@@ -54,8 +54,8 @@ struct LaunchEnvironmentTests {
     @Test(
         "An empty value on either channel yields no override rather than an empty path",
         arguments: [
-            LaunchEnvironment(arguments: ["open-ssh-gui", LaunchEnvironment.overrideArgument, ""], environmentVariables: [:]),
-            LaunchEnvironment(arguments: ["open-ssh-gui"], environmentVariables: [LaunchEnvironment.overrideVariable: ""]),
+            LaunchEnvironment(arguments: ["openssh-pal", LaunchEnvironment.overrideArgument, ""], environmentVariables: [:]),
+            LaunchEnvironment(arguments: ["openssh-pal"], environmentVariables: [LaunchEnvironment.overrideVariable: ""]),
         ]
     )
     func emptyValueYieldsNoOverride(_ environment: LaunchEnvironment) {
@@ -65,7 +65,7 @@ struct LaunchEnvironmentTests {
     @Test("A malformed argument falls through to the environment variable")
     func malformedArgumentFallsThroughToVariable() {
         let environment = LaunchEnvironment(
-            arguments: ["open-ssh-gui", LaunchEnvironment.overrideArgument],
+            arguments: ["openssh-pal", LaunchEnvironment.overrideArgument],
             environmentVariables: [LaunchEnvironment.overrideVariable: "/fabricated/from-variable"]
         )
 

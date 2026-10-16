@@ -54,7 +54,7 @@ nonisolated struct InMemorySSHConfigWriterTests {
     @Test("A backup is created once and then reported as already present")
     func backupIsTakenOnce() async throws {
         let writer = InMemorySSHConfigWriter(files: [Self.config: Self.original])
-        let backup = URL(filePath: "/fabricated/keys/.config.open-ssh-gui-backup")
+        let backup = URL(filePath: "/fabricated/keys/.config.openssh-pal-backup")
 
         #expect(try await writer.backUpIfAbsent(Self.config, to: backup, within: Self.directory) == .created)
         #expect(try await writer.backUpIfAbsent(Self.config, to: backup, within: Self.directory) == .alreadyPresent)

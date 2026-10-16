@@ -18,7 +18,7 @@ struct TemporaryDirectory {
 
     private init() throws {
         url = URL.temporaryDirectory.appending(
-            path: "open-ssh-gui-tests-\(UUID().uuidString)",
+            path: "openssh-pal-tests-\(UUID().uuidString)",
             directoryHint: .isDirectory
         )
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)

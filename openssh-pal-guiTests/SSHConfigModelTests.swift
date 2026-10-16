@@ -203,7 +203,7 @@ struct SSHConfigModelTests {
         #expect(Self.text(harness.writer, Self.file("work")) == "Host w\n    User new\n")
         #expect(Self.text(harness.writer, Self.config) == "Include work\nHost a\n")
         #expect(harness.writer.calls == [
-            .backUp(Self.file("work"), to: Self.file(".work.open-ssh-gui-backup")),
+            .backUp(Self.file("work"), to: Self.file(".work.openssh-pal-backup")),
             .replace(Self.file("work")),
         ])
         #expect(harness.model.notice == .updated("w"))
@@ -238,7 +238,7 @@ struct SSHConfigModelTests {
             #expect(await harness.model.update(entry, with: Self.draft(["a"], user: user), baseline: baseline) == .completed)
         }
 
-        #expect(Self.text(harness.writer, Self.file(".config.open-ssh-gui-backup")) == "Host a\n    User one\n")
+        #expect(Self.text(harness.writer, Self.file(".config.openssh-pal-backup")) == "Host a\n    User one\n")
         #expect(Self.text(harness.writer, Self.config) == "Host a\n    User three\n")
     }
 
@@ -332,7 +332,7 @@ struct SSHConfigModelTests {
 
         #expect(Self.text(harness.writer, Self.config) == "Host b\n")
         // 8.4: the key the block named is not a path this writer was even pointed at.
-        #expect(Set(harness.writer.touchedPaths) == [Self.config, Self.file(".config.open-ssh-gui-backup")])
+        #expect(Set(harness.writer.touchedPaths) == [Self.config, Self.file(".config.openssh-pal-backup")])
         #expect(harness.model.notice == .deleted("a"))
         #expect(harness.model.entries.map(\.displayName) == ["b"])
     }

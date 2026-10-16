@@ -116,10 +116,10 @@ nonisolated struct SSHConfigLoaderTests {
                     "config": "Include conf.d/*\n",
                     "conf.d/b": "Host b\n",
                     "conf.d/a": "Host a\n",
-                    "conf.d/.config.open-ssh-gui-backup": "Host backup\n",
+                    "conf.d/.config.openssh-pal-backup": "Host backup\n",
                 ],
                 directories: [
-                    directory: ["b", "a", ".config.open-ssh-gui-backup"].map { directory.appending(path: $0) },
+                    directory: ["b", "a", ".config.openssh-pal-backup"].map { directory.appending(path: $0) },
                 ]
             )
         )

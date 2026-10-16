@@ -130,7 +130,7 @@ struct KeyMaterialSafetyTests {
         for source in try ProjectSources.application() {
             guard source.text.contains("FileManager") else { continue }
             #expect(
-                source.isIn("open-ssh-gui/FileAccess") || source.relativePath == "open-ssh-gui/OpenSSHGUIApp.swift",
+                source.isIn("openssh-pal/FileAccess") || source.relativePath == "openssh-pal/OpenSSHGUIApp.swift",
                 "\(source.relativePath) uses FileManager outside FileAccess/"
             )
         }

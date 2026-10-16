@@ -12,7 +12,7 @@ nonisolated struct ConfigBackupLocationTests {
     @Test("The backup is a hidden file beside the original")
     func hiddenBesideTheFile() {
         let result = ConfigBackupLocation().backupURL(for: Self.file, avoiding: [])
-        #expect(result == .success(URL(filePath: "/fabricated/keys/config.d/.work.open-ssh-gui-backup")))
+        #expect(result == .success(URL(filePath: "/fabricated/keys/config.d/.work.openssh-pal-backup")))
     }
 
     @Test("An include that matches ordinary names does not match the hidden backup")
@@ -32,7 +32,7 @@ nonisolated struct ConfigBackupLocationTests {
 
     @Test("An include of the exact backup path refuses it; one in another directory does not")
     func exactAndElsewhere() {
-        let exact = [GlobPath(path: "/fabricated/keys/config.d/.work.open-ssh-gui-backup")]
+        let exact = [GlobPath(path: "/fabricated/keys/config.d/.work.openssh-pal-backup")]
         #expect((try? ConfigBackupLocation().backupURL(for: Self.file, avoiding: exact).get()) == nil)
 
         let elsewhere = [GlobPath(path: "/fabricated/other/.*")]

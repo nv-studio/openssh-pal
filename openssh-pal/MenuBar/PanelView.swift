@@ -41,7 +41,7 @@ struct PanelView: View {
                 NSApplication.shared.terminate(nil)
             }
             .keyboardShortcut("q")
-            .accessibilityLabel("Quit open-ssh-gui")
+            .accessibilityLabel("Quit OpenSSH Pal")
         }
         .padding(PanelMetrics.contentInset)
         .frame(width: PanelMetrics.width, height: PanelMetrics.height, alignment: .top)
