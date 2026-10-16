@@ -7,32 +7,32 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		000000000000000000000120 /* open-ssh-gui.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "open-ssh-gui.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		000000000000000000000220 /* open-ssh-guiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "open-ssh-guiTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000120 /* openssh-pal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "openssh-pal.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000220 /* openssh-pal-guiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "openssh-pal-guiTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		14E63CA6306D668A0080E692 /* Exceptions for "open-ssh-gui" folder in "open-ssh-guiTests" target */ = {
+		14E63CA6306D668A0080E692 /* Exceptions for "openssh-pal" folder in "openssh-pal-guiTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				OpenSSHGUIApp.swift,
 			);
-			target = 000000000000000200000000 /* open-ssh-guiTests */;
+			target = 000000000000000200000000 /* openssh-pal-guiTests */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		000000000000000000000011 /* open-ssh-guiTests */ = {
+		000000000000000000000011 /* openssh-pal-guiTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "open-ssh-guiTests";
+			path = "openssh-pal-guiTests";
 			sourceTree = "<group>";
 		};
-		14E63C8E306D66890080E692 /* open-ssh-gui */ = {
+		14E63C8E306D66890080E692 /* openssh-pal */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				14E63CA6306D668A0080E692 /* Exceptions for "open-ssh-gui" folder in "open-ssh-guiTests" target */,
+				14E63CA6306D668A0080E692 /* Exceptions for "openssh-pal" folder in "openssh-pal-guiTests" target */,
 			);
-			path = "open-ssh-gui";
+			path = "openssh-pal";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -54,8 +54,8 @@
 		000000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
-				14E63C8E306D66890080E692 /* open-ssh-gui */,
-				000000000000000000000011 /* open-ssh-guiTests */,
+				14E63C8E306D66890080E692 /* openssh-pal */,
+				000000000000000000000011 /* openssh-pal-guiTests */,
 				000000000000000000000020 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -63,8 +63,8 @@
 		000000000000000000000020 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				000000000000000000000120 /* open-ssh-gui.app */,
-				000000000000000000000220 /* open-ssh-guiTests.xctest */,
+				000000000000000000000120 /* openssh-pal.app */,
+				000000000000000000000220 /* openssh-pal-guiTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -72,9 +72,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		000000000000000100000000 /* open-ssh-gui */ = {
+		000000000000000100000000 /* openssh-pal */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "open-ssh-gui" */;
+			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "openssh-pal" */;
 			buildPhases = (
 				000000000000000120000000 /* Sources */,
 				000000000000000130000000 /* Frameworks */,
@@ -83,16 +83,16 @@
 			buildRules = (
 			);
 			fileSystemSynchronizedGroups = (
-				14E63C8E306D66890080E692 /* open-ssh-gui */,
+				14E63C8E306D66890080E692 /* openssh-pal */,
 			);
-			name = "open-ssh-gui";
+			name = "openssh-pal";
 			productName = MyApp;
-			productReference = 000000000000000000000120 /* open-ssh-gui.app */;
+			productReference = 000000000000000000000120 /* openssh-pal.app */;
 			productType = "com.apple.product-type.application";
 		};
-		000000000000000200000000 /* open-ssh-guiTests */ = {
+		000000000000000200000000 /* openssh-pal-guiTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 000000000000000210000000 /* Build configuration list for PBXNativeTarget "open-ssh-guiTests" */;
+			buildConfigurationList = 000000000000000210000000 /* Build configuration list for PBXNativeTarget "openssh-pal-guiTests" */;
 			buildPhases = (
 				000000000000000220000000 /* Sources */,
 				000000000000000230000000 /* Frameworks */,
@@ -101,12 +101,12 @@
 			buildRules = (
 			);
 			fileSystemSynchronizedGroups = (
-				000000000000000000000011 /* open-ssh-guiTests */,
-				14E63C8E306D66890080E692 /* open-ssh-gui */,
+				000000000000000000000011 /* openssh-pal-guiTests */,
+				14E63C8E306D66890080E692 /* openssh-pal */,
 			);
-			name = "open-ssh-guiTests";
+			name = "openssh-pal-guiTests";
 			productName = "open-ssh-guiTests";
-			productReference = 000000000000000000000220 /* open-ssh-guiTests.xctest */;
+			productReference = 000000000000000000000220 /* openssh-pal-guiTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -127,7 +127,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 000000000000000010000000 /* Build configuration list for PBXProject "open-ssh-gui" */;
+			buildConfigurationList = 000000000000000010000000 /* Build configuration list for PBXProject "openssh-pal" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -141,8 +141,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				000000000000000100000000 /* open-ssh-gui */,
-				000000000000000200000000 /* open-ssh-guiTests */,
+				000000000000000100000000 /* openssh-pal */,
+				000000000000000200000000 /* openssh-pal-guiTests */,
 			);
 		};
 /* End PBXProject section */
@@ -174,7 +174,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		000000000000000011000000 /* Debug configuration for PBXProject "open-ssh-gui" */ = {
+		000000000000000011000000 /* Debug configuration for PBXProject "openssh-pal" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -244,7 +244,7 @@
 			};
 			name = Debug;
 		};
-		000000000000000012000000 /* Release configuration for PBXProject "open-ssh-gui" */ = {
+		000000000000000012000000 /* Release configuration for PBXProject "openssh-pal" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -306,22 +306,38 @@
 			};
 			name = Release;
 		};
-		000000000000000111000000 /* Debug configuration for PBXNativeTarget "open-ssh-gui" */ = {
+		000000000000000111000000 /* Debug configuration for PBXNativeTarget "openssh-pal" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				AUTOMATION_APPLE_EVENTS = NO;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 56BDA39457;
 				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "devplaceholder.$(PROJECT_UNIQUE_VALUE:identifier).$(PRODUCT_NAME:rfc1034identifier)";
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nvstudio.opensshpal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = macosx;
@@ -333,22 +349,38 @@
 			};
 			name = Debug;
 		};
-		000000000000000112000000 /* Release configuration for PBXNativeTarget "open-ssh-gui" */ = {
+		000000000000000112000000 /* Release configuration for PBXNativeTarget "openssh-pal" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				AUTOMATION_APPLE_EVENTS = NO;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 56BDA39457;
 				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "devplaceholder.$(PROJECT_UNIQUE_VALUE:identifier).$(PRODUCT_NAME:rfc1034identifier)";
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nvstudio.opensshpal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = macosx;
@@ -360,7 +392,7 @@
 			};
 			name = Release;
 		};
-		000000000000000211000000 /* Debug configuration for PBXNativeTarget "open-ssh-guiTests" */ = {
+		000000000000000211000000 /* Debug configuration for PBXNativeTarget "openssh-pal-guiTests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -384,7 +416,7 @@
 			};
 			name = Debug;
 		};
-		000000000000000212000000 /* Release configuration for PBXNativeTarget "open-ssh-guiTests" */ = {
+		000000000000000212000000 /* Release configuration for PBXNativeTarget "openssh-pal-guiTests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -411,27 +443,27 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		000000000000000010000000 /* Build configuration list for PBXProject "open-ssh-gui" */ = {
+		000000000000000010000000 /* Build configuration list for PBXProject "openssh-pal" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000011000000 /* Debug configuration for PBXProject "open-ssh-gui" */,
-				000000000000000012000000 /* Release configuration for PBXProject "open-ssh-gui" */,
+				000000000000000011000000 /* Debug configuration for PBXProject "openssh-pal" */,
+				000000000000000012000000 /* Release configuration for PBXProject "openssh-pal" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		000000000000000110000000 /* Build configuration list for PBXNativeTarget "open-ssh-gui" */ = {
+		000000000000000110000000 /* Build configuration list for PBXNativeTarget "openssh-pal" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000111000000 /* Debug configuration for PBXNativeTarget "open-ssh-gui" */,
-				000000000000000112000000 /* Release configuration for PBXNativeTarget "open-ssh-gui" */,
+				000000000000000111000000 /* Debug configuration for PBXNativeTarget "openssh-pal" */,
+				000000000000000112000000 /* Release configuration for PBXNativeTarget "openssh-pal" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		000000000000000210000000 /* Build configuration list for PBXNativeTarget "open-ssh-guiTests" */ = {
+		000000000000000210000000 /* Build configuration list for PBXNativeTarget "openssh-pal-guiTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000211000000 /* Debug configuration for PBXNativeTarget "open-ssh-guiTests" */,
-				000000000000000212000000 /* Release configuration for PBXNativeTarget "open-ssh-guiTests" */,
+				000000000000000211000000 /* Debug configuration for PBXNativeTarget "openssh-pal-guiTests" */,
+				000000000000000212000000 /* Release configuration for PBXNativeTarget "openssh-pal-guiTests" */,
 			);
 			defaultConfigurationName = Release;
 		};
