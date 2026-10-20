@@ -1,0 +1,25 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:          # reused by release.yml
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: xcode-27
+    steps:
+      - uses: actions/checkout@v5
+      - run: xcodebuild -version
+      - name: Test
+        # No Apple account on the runner, so skip signing; the test target has no host app.
+        run: >
+          xcodebuild test
+          -project openssh-pal.xcodeproj
+          -scheme open-ssh-gui
+          -destination 'platform=macOS'
+          CODE_SIGNING_ALLOWED=NO
+

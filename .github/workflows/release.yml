@@ -1,0 +1,174 @@
+# when you push a v* tag, this runs the tests, then signs, notarizes and publishes the release, then updates the tap.
+name: Release
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release          # two tags never race on the tap
+  cancel-in-progress: false
+
+jobs:
+  test:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    needs: test
+    runs-on: xcode-27
+    environment: release
+    permissions:
+      contents: write       # create the release
+      id-token: write       # provenance attestation
+      attestations: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      sha256: ${{ steps.package.outputs.sha256 }}
+    env:
+      TEAM_ID: 56BDA39457
+      APP_NAME: OpenSSH Pal
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0    # needed for the "is on main" check
+
+      - name: Check tag, branch and version
+        id: version
+        run: |
+          TAG="$GITHUB_REF_NAME"
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-beta\.[0-9]+)?$ ]] \
+            || { echo "::error::$TAG is not vX.Y.Z or vX.Y.Z-beta.N"; exit 1; }
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main \
+            || { echo "::error::$TAG does not point at a commit on main"; exit 1; }
+          VERSION="${TAG#v}"
+          BASE="${VERSION%%-*}"
+          PROJECT_VERSION=$(xcodebuild -project openssh-pal.xcodeproj -target openssh-pal \
+            -configuration Release -showBuildSettings | awk '$1 == "MARKETING_VERSION" { print $3 }')
+          [ "$BASE" = "$PROJECT_VERSION" ] \
+            || { echo "::error::tag says $BASE but MARKETING_VERSION is $PROJECT_VERSION"; exit 1; }
+          TITLE="$APP_NAME $BASE"
+          [[ "$VERSION" == *-beta.* ]] && TITLE="$TITLE Beta ${VERSION##*-beta.}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "title=$TITLE" >> "$GITHUB_OUTPUT"
+
+      - name: Import Developer ID certificate
+        env:
+          P12_BASE64: ${{ secrets.DEVELOPER_ID_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.DEVELOPER_ID_P12_PASSWORD }}
+        run: |
+          KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -base64 32)"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          echo "$P12_BASE64" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN" -P "$P12_PASSWORD" -T /usr/bin/codesign
+          rm "$RUNNER_TEMP/cert.p12"
+          curl -fsSL -o "$RUNNER_TEMP/DeveloperIDG2CA.cer" \
+            https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer
+          security import "$RUNNER_TEMP/DeveloperIDG2CA.cer" -k "$KEYCHAIN"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          security find-identity -v -p codesigning "$KEYCHAIN"
+
+      - name: Archive
+        # Command-line settings override the project's Automatic / "Apple Development" signing.
+        run: |
+          xcodebuild archive \
+            -project openssh-pal.xcodeproj \
+            -scheme open-ssh-gui \
+            -configuration Release \
+            -destination 'generic/platform=macOS' \
+            -archivePath "$RUNNER_TEMP/OpenSSHPal.xcarchive" \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Developer ID Application"
+
+      - name: Export
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/OpenSSHPal.xcarchive" \
+            -exportOptionsPlist .github/ExportOptions.plist \
+            -exportPath "$RUNNER_TEMP/export"
+
+      - name: Notarize and staple
+        env:
+          NOTARY_KEY_P8: ${{ secrets.NOTARY_KEY_P8 }}
+          NOTARY_KEY_ID: ${{ secrets.NOTARY_KEY_ID }}
+          NOTARY_ISSUER_ID: ${{ secrets.NOTARY_ISSUER_ID }}
+        run: |
+          APP="$RUNNER_TEMP/export/$APP_NAME.app"
+          printf '%s\n' "$NOTARY_KEY_P8" > "$RUNNER_TEMP/AuthKey.p8"
+          ditto -c -k --sequesterRsrc --keepParent "$APP" "$RUNNER_TEMP/notarize.zip"
+          xcrun notarytool submit "$RUNNER_TEMP/notarize.zip" \
+            --key "$RUNNER_TEMP/AuthKey.p8" --key-id "$NOTARY_KEY_ID" --issuer "$NOTARY_ISSUER_ID" \
+            --wait --timeout 30m
+          rm "$RUNNER_TEMP/AuthKey.p8"
+          xcrun stapler staple "$APP"   # fails if notarization was rejected
+
+      - name: Package and verify
+        id: package
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          APP="$RUNNER_TEMP/export/$APP_NAME.app"
+          ZIP="$RUNNER_TEMP/OpenSSH-Pal-$VERSION.zip"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          xcrun stapler validate "$APP"
+          spctl -a -vvv -t exec "$APP" 2>&1 | tee "$RUNNER_TEMP/spctl.txt"
+          grep -q "source=Notarized Developer ID" "$RUNNER_TEMP/spctl.txt"
+          ditto -c -k --sequesterRsrc --keepParent "$APP" "$ZIP"
+          echo "zip=$ZIP" >> "$GITHUB_OUTPUT"
+          echo "sha256=$(shasum -a 256 "$ZIP" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: ${{ steps.package.outputs.zip }}
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: ${{ steps.version.outputs.title }}
+          ZIP: ${{ steps.package.outputs.zip }}
+        # Not --prerelease: livecheck's github_latest skips pre-releases.
+        run: gh release create "$GITHUB_REF_NAME" "$ZIP" --title "$TITLE" --generate-notes --verify-tag
+
+      - name: Remove signing keychain
+        if: always()
+        run: security delete-keychain "$RUNNER_TEMP/signing.keychain-db" || true
+
+  bump-tap:
+    needs: release
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - uses: actions/create-github-app-token@v2
+        id: token
+        with:
+          app-id: ${{ vars.TAP_APP_ID }}
+          private-key: ${{ secrets.TAP_APP_PRIVATE_KEY }}
+          owner: nv-studio
+          repositories: homebrew-tap
+
+      - uses: actions/checkout@v5
+        with:
+          repository: nv-studio/homebrew-tap
+          token: ${{ steps.token.outputs.token }}
+
+      - name: Update cask and push
+        env:
+          VERSION: ${{ needs.release.outputs.version }}
+          SHA256: ${{ needs.release.outputs.sha256 }}
+        run: |
+          sed -i -E \
+            -e "s/^  version \".*\"$/  version \"$VERSION\"/" \
+            -e "s/^  sha256 \".*\"$/  sha256 \"$SHA256\"/" \
+            Casks/openssh-pal.rb
+          if git diff --quiet; then echo "::error::cask unchanged"; exit 1; fi
+          git diff
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "openssh-pal $VERSION"
+          git push
