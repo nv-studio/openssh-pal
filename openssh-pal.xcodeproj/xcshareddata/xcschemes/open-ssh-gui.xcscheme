@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "000000000000000100000000"
-               BuildableName = "openssh-pal.app"
+               BuildableName = "OpenSSH Pal.app"
                BlueprintName = "openssh-pal"
                ReferencedContainer = "container:openssh-pal.xcodeproj">
             </BuildableReference>
@@ -55,7 +55,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "000000000000000100000000"
-            BuildableName = "openssh-pal.app"
+            BuildableName = "OpenSSH Pal.app"
             BlueprintName = "openssh-pal"
             ReferencedContainer = "container:openssh-pal.xcodeproj">
          </BuildableReference>
@@ -72,7 +72,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "000000000000000100000000"
-            BuildableName = "openssh-pal.app"
+            BuildableName = "OpenSSH Pal.app"
             BlueprintName = "openssh-pal"
             ReferencedContainer = "container:openssh-pal.xcodeproj">
          </BuildableReference>
