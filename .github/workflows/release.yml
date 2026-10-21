@@ -38,8 +38,8 @@ jobs:
         id: version
         run: |
           TAG="$GITHUB_REF_NAME"
-          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-beta\.[0-9]+)?$ ]] \
-            || { echo "::error::$TAG is not vX.Y.Z or vX.Y.Z-beta.N"; exit 1; }
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-beta)?$ ]] \
+            || { echo "::error::$TAG is not vX.Y.Z or vX.Y.Z-beta"; exit 1; }
           git merge-base --is-ancestor "$GITHUB_SHA" origin/main \
             || { echo "::error::$TAG does not point at a commit on main"; exit 1; }
           VERSION="${TAG#v}"
@@ -49,7 +49,7 @@ jobs:
           [ "$BASE" = "$PROJECT_VERSION" ] \
             || { echo "::error::tag says $BASE but MARKETING_VERSION is $PROJECT_VERSION"; exit 1; }
           TITLE="$APP_NAME $BASE"
-          [[ "$VERSION" == *-beta.* ]] && TITLE="$TITLE Beta ${VERSION##*-beta.}"
+          [[ "$VERSION" == *-beta ]] && TITLE="$TITLE Beta"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "title=$TITLE" >> "$GITHUB_OUTPUT"
 
