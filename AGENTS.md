@@ -54,7 +54,7 @@ in `MenuBar/` may reach the file system except through the `FileAccess` port, an
 |---|---|
 | Language | Swift (`SWIFT_VERSION = 5.0`) |
 | UI | SwiftUI |
-| Deployment target | macOS 27.0 |
+| Deployment target | macOS 26.0 |
 | Dependencies | none (no SPM packages) |
 | Sandbox | `ENABLE_APP_SANDBOX = NO` — deliberate, see Established foundation |
 | Presence | `INFOPLIST_KEY_LSUIElement = YES` (agent mode, no Dock icon) |

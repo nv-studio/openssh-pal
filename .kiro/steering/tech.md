@@ -14,7 +14,7 @@ outside the composition root constructs a concrete adapter.
 
 - **Language**: Swift 6.4 toolchain, `SWIFT_VERSION = 5.0` (language mode 5)
 - **UI**: SwiftUI, `MenuBarExtra` as the only scene
-- **Platform**: macOS 27.0+, `SUPPORTED_PLATFORMS = macosx`
+- **Platform**: macOS 26.0+, `SUPPORTED_PLATFORMS = macosx`
 - **Testing**: Swift Testing (`@Test`, `#expect`, `@Suite`)
 - **Build**: Xcode project only — no SPM manifest, no workspace
 
