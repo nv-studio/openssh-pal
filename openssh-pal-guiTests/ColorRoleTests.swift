@@ -12,7 +12,7 @@ struct ColorRoleTests {
         #expect(Set(all).count == all.count)
     }
 
-    @Test("The vocabulary covers text, state, prominence and field chrome")
+    @Test("The vocabulary covers text, state, prominence, field chrome and containers")
     func vocabularyIsComplete() {
         let all = Set(ColorRole.allCases)
 
@@ -20,6 +20,7 @@ struct ColorRoleTests {
         #expect(all.isSuperset(of: [.success, .warning, .failure]))
         #expect(all.isSuperset(of: [.prominent, .destructive]))
         #expect(all.isSuperset(of: [.fieldBorder, .fieldBackground, .separator]))
+        #expect(all.isSuperset(of: [.containerBackground, .rowHover, .selectedTab]))
     }
 
     @Test("Every role resolves to an appearance, which also proves the catalog is in this target")

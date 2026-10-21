@@ -13,6 +13,7 @@ struct PanelToggleStyle: ToggleStyle {
         }
         // Resets the slot so the toggle built here does not receive this style again.
         .toggleStyle(.switch)
+        .pressablePointer()
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

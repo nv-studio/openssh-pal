@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// The menu bar panel: a tab bar, the selected tab's surface, a notice and Quit, at one fixed
-/// size.
+/// The menu bar panel: a tab bar in one container, the selected tab's surface and its notice
+/// in another, and Quit beneath them, at one fixed size.
 ///
 /// **The exact height is the mechanism, not a styling choice.** `menuBarExtraStyle(.window)`
 /// sizes its panel to the content, so a height that settles after the first layout pass is
@@ -25,13 +25,19 @@ struct PanelView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.regular) {
-            TabBar(label: "Sections", options: PanelTab.allCases, selection: selection, title: \.title)
+            PanelContainer(insets: Self.tabContainerInsets) {
+                TabBar(label: "Sections", options: PanelTab.allCases, selection: selection, title: \.title)
+            }
+            .frame(height: PanelMetrics.tabContainerHeight)
 
-            surface
+            PanelContainer(insets: Self.bodyContainerInsets) {
+                VStack(alignment: .leading, spacing: Spacing.regular) {
+                    surface
 
-            noticeRegion
-
-            Divider()
+                    noticeRegion
+                }
+            }
+            .frame(height: PanelMetrics.bodyContainerHeight)
 
             // Outside every tab on purpose: an agent-mode app has no Dock icon and no menu of
             // its own, so this is the user's only way out and it must never be scrolled off or
@@ -42,8 +48,13 @@ struct PanelView: View {
             }
             .keyboardShortcut("q")
             .accessibilityLabel("Quit OpenSSH Pal")
+            // Aligned with the content of the containers above, and pinned to the bottom of
+            // its footer so the margin beneath it is the panel's edge inset.
+            .padding(.horizontal, PanelMetrics.containerPadding)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(height: PanelMetrics.footerHeight, alignment: .bottomLeading)
         }
-        .padding(PanelMetrics.contentInset)
+        .padding(PanelMetrics.edgeInset)
         .frame(width: PanelMetrics.width, height: PanelMetrics.height, alignment: .top)
         // Every open re-reads both the keys and the configuration, so an edit made in a text
         // editor while the app was running is what the user sees. Then a generation that
@@ -56,6 +67,20 @@ struct PanelView: View {
         }
         .onChange(of: newKey.completion) { _, _ in Task { await adoptCompletion() } }
     }
+
+    private static let tabContainerInsets = EdgeInsets(
+        top: Spacing.snug,
+        leading: PanelMetrics.containerPadding,
+        bottom: Spacing.snug,
+        trailing: PanelMetrics.containerPadding
+    )
+
+    private static let bodyContainerInsets = EdgeInsets(
+        top: PanelMetrics.containerPadding,
+        leading: PanelMetrics.containerPadding,
+        bottom: PanelMetrics.containerPadding,
+        trailing: PanelMetrics.containerPadding
+    )
 
     private var navigator: PanelNavigator {
         PanelNavigator(keys: keys, newKey: newKey, hostForm: hostForm)

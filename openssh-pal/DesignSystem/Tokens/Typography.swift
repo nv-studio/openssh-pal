@@ -12,6 +12,10 @@ enum Typography {
     /// The panel's own title.
     static let panelTitle = Font.headline
 
+    /// A section's name in the tab bar. A step above `control`, so the sections read as the
+    /// panel's top level rather than as one more row of buttons.
+    static let tab = Font.title3.weight(.medium)
+
     /// A button or field's own text.
     static let control = Font.body
 
@@ -32,6 +36,6 @@ enum Typography {
     /// Two tokens resolving to the same font would silently merge two roles, and the merge would
     /// only show up as a design review comment months later.
     static let all: [Font] = [
-        sectionHeader, panelTitle, control, fieldLabel, fieldMessage, code, statusMessage,
+        sectionHeader, panelTitle, tab, control, fieldLabel, fieldMessage, code, statusMessage,
     ]
 }

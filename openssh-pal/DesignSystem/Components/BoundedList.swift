@@ -38,11 +38,19 @@ struct BoundedList<Element: Identifiable, Row: View>: View {
             // around nothing.
             EmptyState(content: emptyState)
         } else {
-            List(elements, selection: $selection) { element in
-                row(element)
+            // Drawn here rather than with `List`, whose AppKit table view tracks the pointer in
+            // its own rows: hover and the pointing-hand cursor set on a row's content only took
+            // effect some of the time.
+            ScrollView {
+                LazyVStack(spacing: 0) {
+                    ForEach(elements) { element in
+                        row(element)
+                            .rowHover(isSelected: selection == element.id)
+                            .onTapGesture { selection = element.id }
+                            .accessibilityAddTraits(selection == element.id ? [.isButton, .isSelected] : .isButton)
+                    }
+                }
             }
-            .listStyle(.inset)
-            .scrollContentBackground(.hidden)
             .frame(height: maximumHeight)
         }
     }

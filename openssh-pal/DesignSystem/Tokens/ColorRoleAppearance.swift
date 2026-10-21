@@ -43,6 +43,20 @@ enum ColorRoleAppearance {
             AnyShapeStyle(.quaternary)
         case .separator:
             AnyShapeStyle(.quaternary)
+        case .containerBackground:
+            // The faintest fill there is: a container should be told apart from the panel,
+            // not compete with what it holds.
+            AnyShapeStyle(.quinary)
+        case .rowHover:
+            AnyShapeStyle(.quaternary)
+        case .selectedTab:
+            // Fully opaque white or black, deliberately not `.primary` or `Color.primary`. The
+            // label colour is translucent, and the live menu bar window draws translucent text
+            // brighter than a translucent filled shape, so the underline came out grey beneath
+            // a bright title. An opaque colour renders the same on both.
+            AnyShapeStyle(Color(nsColor: NSColor(name: nil) { appearance in
+                appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? .white : .black
+            }))
         }
     }
 }

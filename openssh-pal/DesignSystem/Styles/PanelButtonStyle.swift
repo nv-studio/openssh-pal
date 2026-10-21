@@ -63,6 +63,9 @@ struct PanelButtonStyle: ButtonStyle {
                         .opacity(emphasis == .plain ? 1 : 0)
                 }
                 .opacity(opacity)
+                // The whole chrome is the hover target, not just the glyphs of the label.
+                .contentShape(.rect(cornerRadius: Radius.control))
+                .pressablePointer(isEnabled: isEnabled)
         }
 
         private var fill: AnyShapeStyle {

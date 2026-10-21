@@ -33,6 +33,7 @@ struct ChoiceRow<Option: Hashable>: View {
             }
             .labelsHidden()
             .pickerStyle(.menu)
+            .pressablePointer()
             .accessibilityLabel(label)
         }
     }

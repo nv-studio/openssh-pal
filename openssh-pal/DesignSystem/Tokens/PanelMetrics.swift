@@ -11,13 +11,20 @@ enum PanelMetrics {
     /// fits all of them. A surface inside the gutter uses `contentWidth`.
     static let width: CGFloat = 320
 
-    /// The gutter between the panel's edge and its content.
+    /// The margin between the panel's edge and what sits directly on it: the two containers
+    /// and Quit. One value on every side, so the margin under Quit matches the one above the
+    /// tab bar.
+    static let edgeInset: CGFloat = 12
+
+    /// The padding between a container's edge and its content.
+    static let containerPadding: CGFloat = 12
+
+    /// The gutter between the panel's edge and a surface's content: the edge inset plus the
+    /// padding of the container the surface sits in.
     ///
-    /// Its own number rather than `Spacing.loose`, for two reasons: `contentWidth` has to be
-    /// derived from the same value, and a panel's gutter is not a gap between siblings — it is
-    /// wider than the largest step on the spacing scale, which is why borrowing the scale's top
-    /// step capped it at 16.
-    static let contentInset: CGFloat = 24
+    /// Its own number rather than `Spacing.loose`, because `contentWidth` has to be derived
+    /// from the same value, and a panel's gutter is not a gap between siblings.
+    static let contentInset: CGFloat = edgeInset + containerPadding
 
     /// The width a surface is laid out at: the panel's width less the gutter on both sides.
     ///
@@ -39,24 +46,36 @@ enum PanelMetrics {
     /// content-sized panel is reported to lay out correctly on the first open and collapse on
     /// later ones. With every region fixed, neither is reachable.
     ///
-    /// The tab bar's height and the gap below it on top of `heightWithoutTabBar`, so adding the
-    /// tab bar takes nothing from any surface or from the bottom margin.
-    static let height: CGFloat = heightWithoutTabBar + tabBarHeight + Spacing.regular
-
-    /// The panel's height before it had a tab bar.
-    ///
-    /// Its regions add up to 541 at the default text size, so about 23 points go unused at the
-    /// bottom. Deliberate: every region here is a fixed height, so a larger text size grows
-    /// into that margin instead of clipping — and the region it would clip first is the Quit
-    /// button, which an agent-mode app with no Dock icon cannot afford to lose. Widening
-    /// `contentInset` has to move this with it, or the gutter is paid for out of that margin.
-    static let heightWithoutTabBar: CGFloat = 564
+    /// The sum of its regions with nothing left over, so no slack collects under Quit: the
+    /// edge inset top and bottom, the tab bar's container, the body's container, the footer
+    /// holding Quit, and a gap between each.
+    static let height: CGFloat =
+        edgeInset * 2 + tabContainerHeight + bodyContainerHeight + footerHeight + Spacing.regular * 2
 
     /// The height of the tab bar at the top of the panel.
     ///
-    /// A segmented control is about 22 points tall at the default text size; the rest is room
-    /// for it to grow with the user's text size without moving the surface below it.
+    /// A tab's title, the gap to its underline and the underline come to about 25 points at
+    /// the default text size; the rest is room for them to grow with the user's text size
+    /// without moving the surface below.
     static let tabBarHeight: CGFloat = 28
+
+    /// The thickness of the line under the selected tab.
+    static let tabUnderlineHeight: CGFloat = 2
+
+    /// The height of the container around the tab bar.
+    static let tabContainerHeight: CGFloat = tabBarHeight + Spacing.snug * 2
+
+    /// The height of the container around the selected tab's surface and its notice.
+    static let bodyContainerHeight: CGFloat =
+        surfaceHeight + Spacing.regular + noticeHeight + containerPadding * 2
+
+    /// The height of the footer holding Quit.
+    ///
+    /// Measured, not guessed: the button renders 24 points tall at the default and the largest
+    /// text size alike, since a macOS push button does not scale with Dynamic Type. Quit is
+    /// pinned to the footer's bottom, so if that ever changes the margin beneath it stays
+    /// `edgeInset` and the difference shows above it instead.
+    static let footerHeight: CGFloat = 24
 
     /// The exact height each panel surface fills, so no surface is content-sized.
     ///

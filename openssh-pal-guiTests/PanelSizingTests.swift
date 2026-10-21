@@ -159,9 +159,17 @@ struct PanelSizingTests {
         }
     }
 
-    @Test("The panel grows by exactly the tab bar and one gap, so no surface loses height to it")
-    func panelGrowsByTheTabBar() {
-        #expect(PanelMetrics.height == PanelMetrics.heightWithoutTabBar + PanelMetrics.tabBarHeight + Spacing.regular)
+    @Test("The panel is the sum of its regions, so no slack collects under Quit")
+    func panelIsTheSumOfItsRegions() {
+        #expect(
+            PanelMetrics.height
+                == PanelMetrics.edgeInset * 2
+                + PanelMetrics.tabContainerHeight
+                + PanelMetrics.bodyContainerHeight
+                + PanelMetrics.footerHeight
+                + Spacing.regular * 2
+        )
+        #expect(PanelMetrics.contentInset == PanelMetrics.edgeInset + PanelMetrics.containerPadding)
         #expect(PanelMetrics.tabBarHeight > 0)
     }
 

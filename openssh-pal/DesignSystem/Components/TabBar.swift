@@ -2,11 +2,12 @@ import SwiftUI
 
 /// A row of mutually exclusive sections at the top of a panel.
 ///
-/// A segmented picker rather than a `TabView`: `TabView`'s behaviour inside a content-sized
-/// `NSPanel` is undocumented and is the change most likely to bring layout recursion back,
-/// while a segmented control is one fixed height. It also shows the selection by shape and
-/// contrast — the selected segment is raised — not by tint alone, and exposes each segment's
-/// name and selected state to VoiceOver natively.
+/// A row of plain buttons rather than a `TabView`: `TabView`'s behaviour inside a
+/// content-sized `NSPanel` is undocumented and is the change most likely to bring layout
+/// recursion back, while this row is one fixed height. The tabs have no background and sit at
+/// the leading edge; the selected one is shown by brighter text *and* an underline, so the
+/// selection is carried by shape as well as contrast, and VoiceOver hears it as the button's
+/// selected trait.
 ///
 /// Generic over the option type and **enumerates nothing itself**: the caller supplies the
 /// options and their titles, so no OpenSSH concept appears in this layer.
@@ -32,18 +33,48 @@ struct TabBar<Option: Hashable>: View {
     }
 
     var body: some View {
-        Picker(label, selection: $selection) {
+        HStack(alignment: .bottom, spacing: Spacing.loose) {
             ForEach(options, id: \.self) { option in
-                Text(title(option)).tag(option)
+                tab(for: option)
             }
         }
-        .pickerStyle(.segmented)
-        .labelsHidden()
+        .frame(maxWidth: .infinity, alignment: .bottomLeading)
+        .accessibilityElement(children: .contain)
         .accessibilityLabel(label)
-        .frame(maxWidth: .infinity)
         // Exact, for the reason every panel region is: a height that settled after the first
         // layout pass is what AppKit reports as layout recursion.
-        .frame(height: PanelMetrics.tabBarHeight)
+        .frame(height: PanelMetrics.tabBarHeight, alignment: .bottomLeading)
+    }
+
+    private func tab(for option: Option) -> some View {
+        let isSelected = option == selection
+
+        // `.plain` rather than the scene's panel style, which would draw button chrome behind
+        // every tab.
+        return Button { selection = option } label: {
+            VStack(alignment: .leading, spacing: Spacing.tight) {
+                Text(title(option))
+                    .font(Typography.tab)
+                    .lineLimit(1)
+
+                // Present on every tab and only drawn on the selected one, so selecting a tab
+                // never moves its title. Filled with the same role as the selected title, an
+                // opaque colour (see `ColorRoleAppearance`), so it is exactly as bright as the
+                // title above it.
+                Rectangle()
+                    .fill(ColorRoleAppearance.style(for: .selectedTab))
+                    .frame(height: PanelMetrics.tabUnderlineHeight)
+                    .opacity(isSelected ? 1 : 0)
+            }
+            .foregroundStyle(ColorRoleAppearance.style(for: isSelected ? .selectedTab : .secondaryText))
+            .fixedSize()
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        // Set here because `.plain` bypasses `PanelButtonStyle`, which is where every other
+        // button gets its cursor.
+        .pressablePointer()
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

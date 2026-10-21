@@ -35,4 +35,13 @@ nonisolated enum ColorRole: Sendable, Hashable, CaseIterable {
 
     /// A hairline between groups.
     case separator
+
+    /// The fill behind a grouping container in the panel.
+    case containerBackground
+
+    /// The fill behind a row under the pointer.
+    case rowHover
+
+    /// The title and underline of the selected tab.
+    case selectedTab
 }
